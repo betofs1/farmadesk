@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmaDesk — Guia Rápido de Dispensação e Orientação Farmacêutica</title>
+<style>
+  :root{
+    --red:#b3122a;
+    --red-deep:#7a0c1d;
+    --red-bright:#e2233f;
+    --ink:#241313;
+    --paper:#fbf7f4;
+    --paper-dim:#f3ece7;
+    --rule:#e5d8d2;
+    --amber:#b3122a;
+    --danger:#7a0c1d;
+    --muted:#8a7570;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Iowan Old Style","Georgia","Source Serif Pro",serif;
+    line-height:1.5;
+  }
+  /* HEADER */
+  header.top{
+    background:linear-gradient(135deg,var(--red-deep),var(--red) 70%);
+    color:#fff;
+    padding:20px 24px;
+    position:sticky;
+    top:0;
+    z-index:50;
+    box-shadow:0 4px 18px rgba(122,12,29,0.25);
+  }
+  .top-row{
+    max-width:1180px;
+    margin:0 auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:12px;}
+  .brand-mark{
+    width:42px;height:42px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.14);
+    border:1px solid rgba(255,255,255,0.3);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-weight:800;
+    font-size:17px;
+    letter-spacing:-0.03em;
+    flex-shrink:0;
+  }
+  h1.title{
+    margin:0;
+    font-size:clamp(20px,3.2vw,27px);
+    font-weight:600;
+    letter-spacing:-0.01em;
+    line-height:1.15;
+  }
+  .subtitle{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:12.5px;
+    color:#f6d9de;
+    margin-top:3px;
+  }
+  .top-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .btn-top{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    background:rgba(255,255,255,0.95);
+    color:var(--red-deep);
+    border:none;
+    padding:9px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+    text-decoration:none;
+    transition:transform .12s ease, box-shadow .12s ease;
+    white-space:nowrap;
+  }
+  .btn-top:hover{
+    transform:translateY(-1px);
+    box-shadow:0 6px 14px rgba(0,0,0,0.18);
+  }
+  .btn-top.ghost{
+    background:rgba(255,255,255,0.12);
+    color:#fff;
+    border:1px solid rgba(255,255,255,0.45);
+  }
+  .btn-top svg{flex-shrink:0;}
+
+  /* SEARCH BAR */
+  .controls{
+    max-width:1180px;
+    margin:18px auto 0;
+    padding:0 20px;
+  }
+  .search-wrap{
+    background:#fff;
+    border:1px solid var(--rule);
+    border-radius:10px;
+    box-shadow:0 10px 24px rgba(122,12,29,0.10);
+    padding:14px 16px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .search-wrap svg{flex-shrink:0;color:var(--red);opacity:.7;}
+  #search{
+    border:none;
+    outline:none;
+    background:transparent;
+    flex:1;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--ink);
+  }
+  #search::placeholder{color:#a7958f;}
+  .helper-text{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11.5px;
+    color:var(--muted);
+    margin:8px 2px 0;
+  }
+
+  /* LAYOUT */
+  .layout{
+    max-width:1180px;
+    margin:26px auto 80px;
+    padding:0 20px;
+    display:grid;
+    grid-template-columns:230px 1fr;
+    gap:26px;
+  }
+  aside.sidebar{
+    position:sticky;
+    top:140px;
+    align-self:start;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .sidebar-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--muted);
+    font-weight:700;
+    margin-bottom:10px;
+    padding-left:2px;
+  }
+  .sys-btn{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    text-align:left;
+    background:none;
+    border:none;
+    border-left:3px solid transparent;
+    padding:8px 10px;
+    font-size:13.5px;
+    color:var(--ink);
+    cursor:pointer;
+    border-radius:0 6px 6px 0;
+    font-family:inherit;
+  }
+  .sys-btn:hover{background:var(--paper-dim);}
+  .sys-btn.active{
+    background:#fdeef0;
+    border-left-color:var(--red);
+    color:var(--red-deep);
+    font-weight:700;
+  }
+  .sys-btn .count{
+    font-size:11px;
+    color:var(--muted);
+    background:var(--paper-dim);
+    padding:1px 7px;
+    border-radius:999px;
+  }
+  .sys-btn.active .count{background:#fbd9de;color:var(--red-deep);}
+
+  main{min-width:0;}
+  #count{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    color:var(--muted);
+    margin-bottom:14px;
+  }
+  .card{
+    background:#fffefc;
+    border:1px solid var(--rule);
+    border-radius:12px;
+    margin-bottom:14px;
+    overflow:hidden;
+    transition:box-shadow .2s ease;
+  }
+  .card.open{box-shadow:0 8px 22px rgba(122,12,29,0.08);}
+  .card-head{
+    padding:16px 20px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:14px;
+  }
+  .card-head:hover{background:var(--paper-dim);}
+  .head-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+  .system-tag{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    color:var(--amber);
+    font-weight:700;
+    white-space:nowrap;
+  }
+  h2.cond-title{
+    margin:0;
+    font-size:18.5px;
+    font-weight:600;
+    color:var(--red-deep);
+  }
+  .chevron{
+    width:18px;height:18px;
+    flex-shrink:0;
+    transition:transform .2s ease;
+    color:var(--red);
+  }
+  .card.open .chevron{transform:rotate(180deg);}
+  .card-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .28s ease;
+  }
+  .card.open .card-body{max-height:4000px;}
+  .body-inner{
+    padding:0 22px 22px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:14px;
+  }
+  .block{margin-top:15px;}
+  .block:first-child{margin-top:4px;}
+  .block-label{
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    font-weight:700;
+    color:var(--red);
+    border-bottom:1px solid var(--rule);
+    padding-bottom:5px;
+    margin-bottom:9px;
+  }
+  .block ul{margin:0;padding-left:19px;}
+  .block li{margin-bottom:8px;}
+  .block li:last-child{margin-bottom:0;}
+  .block p{margin:0 0 8px;}
+  .block p:last-child{margin-bottom:0;}
+  mark{background:#fbd9de; padding:0 2px; border-radius:2px;}
+
+  .empty-content{
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:13px;
+    color:var(--muted);
+    background:var(--paper-dim);
+    border:1px dashed var(--rule);
+    border-radius:8px;
+    padding:14px 16px;
+    margin-top:4px;
+  }
+
+  .empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:var(--muted);
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+
+  footer{
+    text-align:center;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11.5px;
+    color:var(--muted);
+    padding:10px 20px 50px;
+  }
+  .legal-box{
+    max-width:720px;
+    margin:0 auto;
+    text-align:left;
+    background:var(--paper-dim);
+    border:1px solid var(--rule);
+    border-radius:10px;
+    padding:18px 20px;
+  }
+  .legal-box strong{
+    display:block;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--red-deep);
+    margin-bottom:10px;
+  }
+  .legal-box p{margin:0 0 9px; line-height:1.55;}
+  .legal-box p:last-child{margin-bottom:0;}
+  .legal-meta{font-style:italic; color:var(--muted);}
+
+  /* MODAL - calculadora pediátrica */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(36,19,19,0.5);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:100;
+    padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff;
+    border-radius:14px;
+    max-width:480px;
+    width:100%;
+    max-height:86vh;
+    overflow-y:auto;
+    box-shadow:0 24px 60px rgba(0,0,0,0.3);
+    font-family:"Helvetica Neue",Arial,sans-serif;
+  }
+  .modal-head{
+    background:linear-gradient(135deg,var(--red-deep),var(--red));
+    color:#fff;
+    padding:18px 22px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    border-radius:14px 14px 0 0;
+  }
+  .modal-head h3{margin:0 0 3px; font-size:17px; font-family:"Iowan Old Style",Georgia,serif;}
+  .modal-head p{margin:0; font-size:12px; color:#f6d9de;}
+  .modal-close{
+    background:rgba(255,255,255,0.15);
+    border:none;
+    color:#fff;
+    width:28px;height:28px;
+    border-radius:7px;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .modal-body{padding:20px 22px 22px;}
+  .field-row{margin-bottom:14px;}
+  .field-row label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    color:var(--ink);
+    margin-bottom:5px;
+  }
+  .field-row input, .field-row select{
+    width:100%;
+    padding:9px 11px;
+    border:1px solid var(--rule);
+    border-radius:7px;
+    font-size:14px;
+    font-family:inherit;
+    background:var(--paper);
+  }
+  .field-row input:focus, .field-row select:focus{outline:2px solid var(--red); outline-offset:1px;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .calc-result{
+    margin-top:16px;
+    background:var(--paper-dim);
+    border:1px dashed var(--rule);
+    border-radius:9px;
+    padding:14px 16px;
+    font-size:13px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .calc-note{
+    font-size:11px;
+    color:var(--muted);
+    margin-top:14px;
+    line-height:1.5;
+  }
+
+  .consent-modal{max-width:520px;}
+  .consent-modal .modal-body{font-size:13.5px; line-height:1.6;}
+  .consent-modal .modal-body p{margin:0 0 10px;}
+  .consent-checkrow{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    margin:16px 0 6px;
+    font-size:13px;
+  }
+  .consent-checkrow input{margin-top:3px; flex-shrink:0;}
+  .consent-btn{
+    width:100%;
+    margin-top:12px;
+    background:var(--red);
+    color:#fff;
+    border:none;
+    padding:11px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    opacity:.5;
+    pointer-events:none;
+    transition:opacity .15s ease;
+  }
+  .consent-btn.enabled{opacity:1; pointer-events:auto;}
+  .consent-btn:hover.enabled{background:var(--red-deep);}
+
+  @media(max-width:760px){
+    .layout{grid-template-columns:1fr;}
+    aside.sidebar{
+      position:static;
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding-bottom:6px;
+    }
+    .sidebar-title{display:none;}
+    .sys-btn{
+      flex-shrink:0;
+      border-left:none;
+      border:1px solid var(--rule);
+      border-radius:999px;
+    }
+    .sys-btn.active{border-color:var(--red);}
+    .card-head{padding:14px 16px;}
+    .body-inner{padding:0 16px 18px;}
+    .top-row{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-row">
+    <div class="brand">
+      <div class="brand-mark">Rx</div>
+      <div>
+        <h1 class="title">FarmaDesk</h1>
+        <div class="subtitle">Guia Rápido de Dispensação e Orientação Farmacêutica</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="btn-top" id="openCalc" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
+        Calculadora pediátrica
+      </button>
+      <a class="btn-top ghost" href="https://consultas.anvisa.gov.br/#/bulario/" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Bulário ANVISA
+      </a>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search" type="text" placeholder="Busque por sintoma, fármaco ou nome comercial.">
+    </div>
+    <div class="helper-text">Resultados descritivos e organizados por sistema — pensados para consulta rápida no balcão.</div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Sistemas</div>
+    <div id="sysList"></div>
+  </aside>
+
+  <main>
+    <div id="count"></div>
+    <div id="cards"></div>
+    <div class="empty-state" id="empty" style="display:none;">Nenhuma condição encontrada para essa busca.</div>
+  </main>
+</div>
+
+<footer>
+  <div class="legal-box">
+    <strong>Aviso Legal e Limitação de Responsabilidade</strong>
+    <p>Este material é uma ferramenta de apoio à consulta técnica, destinada exclusivamente a profissionais farmacêuticos e da saúde devidamente habilitados. Não constitui prescrição, diagnóstico ou substituto da avaliação clínica individualizada do paciente.</p>
+    <p>As informações aqui reunidas têm caráter informativo e foram compiladas a partir de referências bibliográficas e bulas vigentes na data de elaboração, podendo conter desatualizações, imprecisões ou divergências em relação a alterações regulatórias posteriores (ANVISA, RDCs, atualizações de bula). É responsabilidade do profissional usuário confirmar posologia, contraindicações e interações na bula oficial vigente e em fontes regulatórias atualizadas antes de qualquer orientação ao paciente.</p>
+    <p>O uso deste material é de inteira responsabilidade do usuário. O autor não se responsabiliza por decisões clínicas, dispensações ou orientações realizadas com base, total ou parcial, neste conteúdo, tampouco por uso indevido, fora do contexto profissional para o qual foi concebido.</p>
+    <p class="legal-meta">Material de uso pessoal e não comercial, em desenvolvimento contínuo.</p>
+  </div>
+</footer>
+
+<!-- MODAL DE CONSENTIMENTO -->
+<div class="modal-overlay" id="consentOverlay">
+  <div class="modal consent-modal">
+    <div class="modal-head">
+      <div>
+        <h3>Antes de continuar</h3>
+        <p>Leia o aviso legal abaixo</p>
+      </div>
+    </div>
+    <div class="modal-body">
+      <p><strong>Aviso Legal e Limitação de Responsabilidade.</strong> Este material é uma ferramenta de apoio à consulta técnica, destinada exclusivamente a profissionais farmacêuticos e da saúde devidamente habilitados. Não constitui prescrição, diagnóstico ou substituto da avaliação clínica individualizada do paciente.</p>
+      <p>As informações têm caráter informativo e podem conter desatualizações ou imprecisões em relação a alterações regulatórias posteriores. É responsabilidade do usuário confirmar posologia, contraindicações e interações na bula oficial vigente antes de qualquer orientação ao paciente.</p>
+      <p>O uso é de inteira responsabilidade do usuário. O autor não se responsabiliza por decisões clínicas tomadas com base neste conteúdo, nem por uso fora do contexto profissional para o qual foi concebido.</p>
+      <label class="consent-checkrow">
+        <input type="checkbox" id="consentCheck">
+        <span>Declaro que sou profissional de saúde habilitado, li o aviso acima e assumo a responsabilidade pelo uso deste material.</span>
+      </label>
+      <button class="consent-btn" id="consentBtn" type="button">Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CALCULADORA PEDIÁTRICA -->
+<div class="modal-overlay" id="calcOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3>Calculadora pediátrica</h3>
+        <p>Dose por peso e idade — em construção</p>
+      </div>
+      <button class="modal-close" id="closeCalc" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label for="calcDrug">Fármaco</label>
+        <select id="calcDrug">
+          <option>Selecione um fármaco…</option>
+          <option>Dipirona</option>
+          <option>Paracetamol</option>
+          <option>Ibuprofeno</option>
+          <option>Amoxicilina</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <div class="field-row">
+          <label for="calcAge">Idade</label>
+          <input id="calcAge" type="number" min="0" placeholder="ex.: 1 ano">
+        </div>
+        <div class="field-row">
+          <label for="calcWeight">Peso (kg)</label>
+          <input id="calcWeight" type="number" min="0" step="0.1" placeholder="ex.: 12">
+        </div>
+      </div>
+      <div class="calc-result">
+        Cálculo de dose ainda não configurado para este fármaco.<br>
+        As tabelas de dose/kg serão adicionadas em breve.
+      </div>
+      <div class="calc-note">Esta ferramenta é um apoio de cálculo e não substitui a checagem da bula e do julgamento clínico individualizado. Os parâmetros de dose por kg serão inseridos posteriormente.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let APP_DATA = { systems: [], conditions: [] };
+
+async function loadData(){
+  try{
+    const res = await fetch('dados.json', { cache: 'no-store' });
+    APP_DATA = await res.json();
+  }catch(e){
+    console.error('Erro ao carregar dados.json', e);
+    cardsEl.innerHTML = '<div class="empty-content">Não foi possível carregar dados.json. Verifique se o arquivo está na mesma pasta do index.html.</div>';
+  }
+}
+
+let systems = [];
+let allConditions = [];
+
+let activeSystem = 'all';
+
+const sysListEl = document.getElementById('sysList');
+const cardsEl = document.getElementById('cards');
+const countEl = document.getElementById('count');
+const emptyEl = document.getElementById('empty');
+const searchEl = document.getElementById('search');
+
+function countFor(slug){
+  if(slug === 'all') return allConditions.length;
+  return allConditions.filter(c => c.systemSlug === slug).length;
+}
+
+function renderSidebar(){
+  const items = [{slug:'all', label:'Todos os sistemas'}, ...systems];
+  sysListEl.innerHTML = items.map(s => `
+    <button class="sys-btn ${activeSystem===s.slug?'active':''}" data-slug="${s.slug}">
+      <span>${s.label}</span>
+      <span class="count">${countFor(s.slug)}</span>
+    </button>
+  `).join('');
+  sysListEl.querySelectorAll('.sys-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeSystem = btn.dataset.slug;
+      render(searchEl.value);
+    });
+  });
+}
+
+function highlight(text, q){
+  if(!q) return text;
+  try{
+    const re = new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig');
+    return text.replace(re, '<mark>$1</mark>');
+  }catch(e){return text;}
+}
+
+function render(filter){
+  const q = (filter || '').trim().toLowerCase();
+  let filtered = allConditions;
+  if(activeSystem !== 'all'){
+    filtered = filtered.filter(c => c.systemSlug === activeSystem);
+  }
+  if(q){
+    filtered = filtered.filter(c => (c.title + ' ' + c.html.replace(/<[^>]+>/g,' ')).toLowerCase().includes(q));
+  }
+
+  countEl.textContent = `${filtered.length} de ${allConditions.length} condições`;
+  emptyEl.style.display = filtered.length ? 'none' : 'block';
+
+  cardsEl.innerHTML = filtered.map((c) => `
+    <article class="card" data-id="${c.id}">
+      <div class="card-head">
+        <div class="head-left">
+          <span class="system-tag">${c.systemLabel}</span>
+          <h2 class="cond-title">${q ? highlight(c.title,q) : c.title}</h2>
+        </div>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="card-body">
+        <div class="body-inner">
+          ${c.html ? c.html : '<div class="empty-content">Conteúdo em preparação — informações de triagem, posologia e orientação serão adicionadas em breve.</div>'}
+        </div>
+      </div>
+    </article>
+  `).join('');
+
+  document.querySelectorAll('.card-head').forEach(head => {
+    head.addEventListener('click', () => {
+      head.parentElement.classList.toggle('open');
+    });
+  });
+
+  renderSidebar();
+}
+
+searchEl.addEventListener('input', e => render(e.target.value));
+
+// Modal de consentimento (primeira visita)
+const consentOverlay = document.getElementById('consentOverlay');
+const consentCheck = document.getElementById('consentCheck');
+const consentBtn = document.getElementById('consentBtn');
+const CONSENT_KEY = 'farmadesk_consent_v1';
+
+if(!localStorage.getItem(CONSENT_KEY)){
+  consentOverlay.classList.add('open');
+}
+consentCheck.addEventListener('change', () => {
+  consentBtn.classList.toggle('enabled', consentCheck.checked);
+});
+consentBtn.addEventListener('click', () => {
+  if(!consentCheck.checked) return;
+  localStorage.setItem(CONSENT_KEY, '1');
+  consentOverlay.classList.remove('open');
+});
+
+// Modal calculadora pediátrica
+const calcOverlay = document.getElementById('calcOverlay');
+document.getElementById('openCalc').addEventListener('click', () => calcOverlay.classList.add('open'));
+document.getElementById('closeCalc').addEventListener('click', () => calcOverlay.classList.remove('open'));
+calcOverlay.addEventListener('click', (e) => { if(e.target === calcOverlay) calcOverlay.classList.remove('open'); });
+
+(async function init(){
+  countEl.textContent = 'Carregando condições…';
+  await loadData();
+  systems = APP_DATA.systems || [];
+  allConditions = APP_DATA.conditions || [];
+  render('');
+})();
+</script>
+
+</body>
+</html>
