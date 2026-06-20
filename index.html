@@ -601,7 +601,7 @@ function countFor(slug){
 }
 
 function renderSidebar(){
-  const items = [{slug:'all', label:'Todos os sistemas'}, ...systems];
+  const items = [{slug:'all', label:'<strong>Todos os sistemas</strong>'}, ...systems];
   sysListEl.innerHTML = items.map(s => `
     <button class="sys-btn ${activeSystem===s.slug?'active':''}" data-slug="${s.slug}">
       <span>${s.label}</span>
