@@ -4,18 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FarmaDesk — Guia Rápido de Dispensação e Orientação Farmacêutica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#b3122a;
-    --red-deep:#7a0c1d;
-    --red-bright:#e2233f;
-    --ink:#241313;
-    --paper:#fbf7f4;
-    --paper-dim:#f3ece7;
-    --rule:#e5d8d2;
-    --amber:#b3122a;
-    --danger:#7a0c1d;
-    --muted:#8a7570;
+    --red:#e2233f;
+    --red-deep:#b3122a;
+    --red-bright:#ff3355;
+    --ink:#f2eae8;
+    --paper:#0c0c0e;
+    --paper-dim:#19181b;
+    --card:#161517;
+    --rule:#2c2a2d;
+    --amber:#ff5470;
+    --danger:#ff5470;
+    --muted:#8d8589;
   }
   *{box-sizing:border-box;}
   body{
@@ -27,13 +31,14 @@
   }
   /* HEADER */
   header.top{
-    background:linear-gradient(135deg,var(--red-deep),var(--red) 70%);
+    background:linear-gradient(135deg,#000000,#1a0307 55%,var(--red-deep) 130%);
     color:#fff;
     padding:20px 24px;
     position:sticky;
     top:0;
     z-index:50;
-    box-shadow:0 4px 18px rgba(122,12,29,0.25);
+    box-shadow:0 4px 18px rgba(0,0,0,0.5);
+    border-bottom:1px solid rgba(226,35,63,0.25);
   }
   .top-row{
     max-width:1180px;
@@ -44,31 +49,22 @@
     gap:16px;
     flex-wrap:wrap;
   }
-  .brand{display:flex; align-items:center; gap:12px;}
-  .brand-mark{
-    width:42px;height:42px;
-    border-radius:10px;
-    background:rgba(255,255,255,0.14);
-    border:1px solid rgba(255,255,255,0.3);
-    display:flex;align-items:center;justify-content:center;
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-weight:800;
-    font-size:17px;
-    letter-spacing:-0.03em;
-    flex-shrink:0;
+  .brand{display:flex; flex-direction:column; align-items:flex-start; gap:4px;}
+  .brand-wordmark{
+    display:flex;
+    align-items:center;
   }
-  h1.title{
-    margin:0;
-    font-size:clamp(20px,3.2vw,27px);
-    font-weight:600;
-    letter-spacing:-0.01em;
-    line-height:1.15;
+  .brand-wordmark img{
+    height:60px;
+    width:auto;
+    display:block;
   }
   .subtitle{
     font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:12.5px;
-    color:#f6d9de;
-    margin-top:3px;
+    font-size:13px;
+    color:#ffffff;
+    margin-top:0;
+    margin-left:2px;
   }
   .top-actions{
     display:flex;
@@ -80,8 +76,8 @@
     display:flex;
     align-items:center;
     gap:7px;
-    background:rgba(255,255,255,0.95);
-    color:var(--red-deep);
+    background:var(--red);
+    color:#fff;
     border:none;
     padding:9px 14px;
     border-radius:8px;
@@ -89,18 +85,20 @@
     font-weight:700;
     cursor:pointer;
     text-decoration:none;
-    transition:transform .12s ease, box-shadow .12s ease;
+    transition:transform .12s ease, box-shadow .12s ease, background .12s ease;
     white-space:nowrap;
   }
   .btn-top:hover{
     transform:translateY(-1px);
-    box-shadow:0 6px 14px rgba(0,0,0,0.18);
+    background:var(--red-bright);
+    box-shadow:0 6px 14px rgba(226,35,63,0.35);
   }
   .btn-top.ghost{
-    background:rgba(255,255,255,0.12);
+    background:rgba(255,255,255,0.06);
     color:#fff;
-    border:1px solid rgba(255,255,255,0.45);
+    border:1px solid rgba(255,255,255,0.22);
   }
+  .btn-top.ghost:hover{background:rgba(255,255,255,0.12); box-shadow:none;}
   .btn-top svg{flex-shrink:0;}
 
   /* SEARCH BAR */
@@ -110,17 +108,17 @@
     padding:0 20px;
   }
   .search-wrap{
-    background:#fff;
+    background:var(--card);
     border:1px solid var(--rule);
     border-radius:10px;
-    box-shadow:0 10px 24px rgba(122,12,29,0.10);
+    box-shadow:0 10px 24px rgba(0,0,0,0.35);
     padding:14px 16px;
     display:flex;
     gap:12px;
     align-items:center;
     font-family:"Helvetica Neue",Arial,sans-serif;
   }
-  .search-wrap svg{flex-shrink:0;color:var(--red);opacity:.7;}
+  .search-wrap svg{flex-shrink:0;color:var(--red);opacity:.9;}
   #search{
     border:none;
     outline:none;
@@ -130,13 +128,28 @@
     font-family:inherit;
     color:var(--ink);
   }
-  #search::placeholder{color:#a7958f;}
+  #search::placeholder{color:#d1ced0;}
+  .clear-btn{
+    display:none;
+    align-items:center;
+    justify-content:center;
+    width:24px;height:24px;
+    border:none;
+    border-radius:50%;
+    background:var(--paper-dim);
+    color:var(--muted);
+    cursor:pointer;
+    flex-shrink:0;
+    transition:background .15s ease, color .15s ease;
+  }
+  .clear-btn:hover{background:var(--red-deep); color:#fff;}
+  .clear-btn.show{display:flex;}
   .helper-text{
-  font-family:"Helvetica Neue",Arial,sans-serif;
-  font-size:11.5px;
-  color:#ffffff;
-  margin:8px 2px 0;
-}
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-size:11.5px;
+    color:var(--muted);
+    margin:8px 2px 0;
+  }
 
   /* LAYOUT */
   .layout{
@@ -180,9 +193,9 @@
   }
   .sys-btn:hover{background:var(--paper-dim);}
   .sys-btn.active{
-    background:#fdeef0;
+    background:rgba(226,35,63,0.14);
     border-left-color:var(--red);
-    color:var(--red-deep);
+    color:var(--red-bright);
     font-weight:700;
   }
   .sys-btn .count{
@@ -192,7 +205,7 @@
     padding:1px 7px;
     border-radius:999px;
   }
-  .sys-btn.active .count{background:#fbd9de;color:var(--red-deep);}
+  .sys-btn.active .count{background:rgba(226,35,63,0.28);color:var(--red-bright);}
 
   main{min-width:0;}
   #count{
@@ -204,14 +217,14 @@
     margin-bottom:14px;
   }
   .card{
-    background:#fffefc;
+    background:var(--card);
     border:1px solid var(--rule);
     border-radius:12px;
     margin-bottom:14px;
     overflow:hidden;
     transition:box-shadow .2s ease;
   }
-  .card.open{box-shadow:0 8px 22px rgba(122,12,29,0.08);}
+  .card.open{box-shadow:0 8px 22px rgba(0,0,0,0.4);}
   .card-head{
     padding:16px 20px;
     cursor:pointer;
@@ -235,7 +248,7 @@
     margin:0;
     font-size:18.5px;
     font-weight:600;
-    color:var(--red-deep);
+    color:#fff;
   }
   .chevron{
     width:18px;height:18px;
@@ -248,12 +261,14 @@
     max-height:0;
     overflow:hidden;
     transition:max-height .28s ease;
+    background:#f0e4d9;
   }
   .card.open .card-body{max-height:4000px;}
   .body-inner{
-    padding:0 22px 22px;
+    padding:18px 22px 22px;
     font-family:"Helvetica Neue",Arial,sans-serif;
     font-size:14px;
+    color:#2a2424;
   }
   .block{margin-top:15px;}
   .block:first-child{margin-top:4px;}
@@ -262,8 +277,8 @@
     text-transform:uppercase;
     letter-spacing:.09em;
     font-weight:700;
-    color:var(--red);
-    border-bottom:1px solid var(--rule);
+    color:var(--red-deep);
+    border-bottom:1px solid #ddd2cb;
     padding-bottom:5px;
     margin-bottom:9px;
   }
@@ -272,14 +287,15 @@
   .block li:last-child{margin-bottom:0;}
   .block p{margin:0 0 8px;}
   .block p:last-child{margin-bottom:0;}
-  mark{background:#fbd9de; padding:0 2px; border-radius:2px;}
+  .block strong{color:#1a1414;}
+  mark{background:var(--red); color:#fff; padding:0 2px; border-radius:2px;}
 
   .empty-content{
     font-family:"Helvetica Neue",Arial,sans-serif;
     font-size:13px;
-    color:var(--muted);
-    background:var(--paper-dim);
-    border:1px dashed var(--rule);
+    color:#75696a;
+    background:#e9e2dd;
+    border:1px dashed #ddd2cb;
     border-radius:8px;
     padding:14px 16px;
     margin-top:4px;
@@ -313,7 +329,7 @@
     font-size:12px;
     text-transform:uppercase;
     letter-spacing:.08em;
-    color:var(--red-deep);
+    color:var(--red-bright);
     margin-bottom:10px;
   }
   .legal-box p{margin:0 0 9px; line-height:1.55;}
@@ -323,7 +339,7 @@
   /* MODAL - calculadora pediátrica */
   .modal-overlay{
     position:fixed; inset:0;
-    background:rgba(36,19,19,0.5);
+    background:rgba(0,0,0,0.7);
     display:none;
     align-items:center;
     justify-content:center;
@@ -332,17 +348,19 @@
   }
   .modal-overlay.open{display:flex;}
   .modal{
-    background:#fff;
+    background:var(--card);
+    border:1px solid var(--rule);
     border-radius:14px;
     max-width:480px;
     width:100%;
     max-height:86vh;
     overflow-y:auto;
-    box-shadow:0 24px 60px rgba(0,0,0,0.3);
+    box-shadow:0 24px 60px rgba(0,0,0,0.6);
     font-family:"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
   }
   .modal-head{
-    background:linear-gradient(135deg,var(--red-deep),var(--red));
+    background:linear-gradient(135deg,#000,var(--red-deep) 140%);
     color:#fff;
     padding:18px 22px;
     display:flex;
@@ -351,7 +369,7 @@
     border-radius:14px 14px 0 0;
   }
   .modal-head h3{margin:0 0 3px; font-size:17px; font-family:"Iowan Old Style",Georgia,serif;}
-  .modal-head p{margin:0; font-size:12px; color:#f6d9de;}
+  .modal-head p{margin:0; font-size:12px; color:#f3c6cd;}
   .modal-close{
     background:rgba(255,255,255,0.15);
     border:none;
@@ -379,6 +397,7 @@
     font-size:14px;
     font-family:inherit;
     background:var(--paper);
+    color:var(--ink);
   }
   .field-row input:focus, .field-row select:focus{outline:2px solid var(--red); outline-offset:1px;}
   .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
@@ -457,11 +476,10 @@
 <header class="top">
   <div class="top-row">
     <div class="brand">
-      <div class="brand-mark">FD</div>
-      <div>
-        <h1 class="title">FarmaDesk</h1>
-        <div class="subtitle">Guia Rápido de Dispensação e Orientação Farmacêutica</div>
+      <div class="brand-wordmark">
+        <img src="marca.png" alt="FarmaDesk">
       </div>
+      <div class="subtitle">Guia Rápido de Dispensação e Orientação Farmacêutica</div>
     </div>
     <div class="top-actions">
       <button class="btn-top" id="openCalc" type="button">
@@ -479,9 +497,11 @@
     <div class="search-wrap">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="search" type="text" placeholder="Busque por sintoma, fármaco ou nome comercial.">
+      <button id="clearSearch" class="clear-btn" type="button" title="Limpar busca" aria-label="Limpar busca">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div class="helper-text">Resultados descritivos e organizados por sistema, pensados para consulta rápida no balcão.</div>
-  </div>
+    
 </header>
 
 <div class="layout">
@@ -601,7 +621,7 @@ function countFor(slug){
 }
 
 function renderSidebar(){
-  const items = [{slug:'all', label:'<strong>Todos os sistemas</strong>'}, ...systems];
+  const items = [{slug:'all', label:'Todos os sistemas'}, ...systems];
   sysListEl.innerHTML = items.map(s => `
     <button class="sys-btn ${activeSystem===s.slug?'active':''}" data-slug="${s.slug}">
       <span>${s.label}</span>
@@ -663,7 +683,17 @@ function render(filter){
   renderSidebar();
 }
 
-searchEl.addEventListener('input', e => render(e.target.value));
+const clearBtn = document.getElementById('clearSearch');
+function toggleClearBtn(){
+  clearBtn.classList.toggle('show', searchEl.value.length > 0);
+}
+searchEl.addEventListener('input', e => { render(e.target.value); toggleClearBtn(); });
+clearBtn.addEventListener('click', () => {
+  searchEl.value = '';
+  render('');
+  toggleClearBtn();
+  searchEl.focus();
+});
 
 // Modal de consentimento (primeira visita)
 const consentOverlay = document.getElementById('consentOverlay');
