@@ -264,31 +264,56 @@
     transition:max-height .28s ease;
     background:#f0e4d9;
   }
-  .card.open .card-body{max-height:4000px;}
+  .card.open .card-body{max-height:6000px;}
   .body-inner{
-    padding:18px 22px 22px;
+    padding:0 0 20px;
     font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:14px;
+    font-size:13.5px;
     color:#2a2424;
   }
-  .block{margin-top:15px;}
-  .block:first-child{margin-top:4px;}
+  .block{margin-top:18px;}
+  .block:first-child{margin-top:0;}
   .block-label{
-    font-size:10.5px;
-    text-transform:uppercase;
-    letter-spacing:.09em;
+    font-size:13px;
     font-weight:700;
-    color:var(--red-deep);
-    border-bottom:1px solid #ddd2cb;
-    padding-bottom:5px;
-    margin-bottom:9px;
+    color:#0a2533;
+    background:linear-gradient(180deg,#bfe6f2,#a9dcec);
+    padding:7px 22px;
+    margin-bottom:12px;
+    border-top:1px solid #93cfe0;
+    border-bottom:1px solid #93cfe0;
   }
-  .block ul{margin:0;padding-left:19px;}
-  .block li{margin-bottom:8px;}
+  .block > ul{margin:0; padding:0 22px 0 40px;}
+  .block > p{margin:0 22px 8px; padding:0 0 0 0;}
+  .block ul ul{
+    list-style:circle;
+    margin-top:6px;
+    padding-left:22px;
+  }
+  .block li{margin-bottom:9px;}
   .block li:last-child{margin-bottom:0;}
   .block p{margin:0 0 8px;}
   .block p:last-child{margin-bottom:0;}
   .block strong{color:#1a1414;}
+  /* primeiro nível de item = sub-categoria, em destaque âmbar */
+  .block > ul > li{
+    color:#b8540a;
+    font-weight:700;
+  }
+  .block > ul > li > strong:first-child{color:#b8540a;}
+  .block > ul > li > p > strong:first-child{color:#b8540a;}
+  /* itens aninhados = fármacos/orientações, texto neutro */
+  .block ul ul li{
+    color:#2a2424;
+    font-weight:400;
+  }
+  .block ul ul li strong{color:#1a1414; font-weight:700;}
+  .block em{
+    color:var(--red-deep);
+    font-style:normal;
+    text-decoration:underline;
+    text-decoration-color:rgba(179,18,42,0.45);
+  }
   mark{background:var(--red); color:#fff; padding:0 2px; border-radius:2px;}
 
   .empty-content{
@@ -299,6 +324,7 @@
     border:1px dashed #ddd2cb;
     border-radius:8px;
     padding:14px 16px;
+    margin:0 22px;
     margin-top:4px;
   }
 
@@ -467,7 +493,11 @@
     }
     .sys-btn.active{border-color:var(--red);}
     .card-head{padding:14px 16px;}
-    .body-inner{padding:0 16px 18px;}
+    .body-inner{padding:0 0 14px;}
+    .block-label{padding:7px 16px;}
+    .block > ul{padding:0 16px 0 32px;}
+    .block > p{margin:0 16px 8px;}
+    .empty-content{margin:0 16px;}
     .top-row{flex-direction:column;}
   }
 </style>
