@@ -283,8 +283,14 @@
     border-top:1px solid #93cfe0;
     border-bottom:1px solid #93cfe0;
   }
-  .block > ul{margin:0; padding:0 22px 0 40px;}
-  .block > p{margin:0 22px 8px; padding:0 0 0 0;}
+  .label-sub{
+    font-weight:400;
+    font-style:italic;
+    font-size:12.5px;
+    color:#1c4a5c;
+  }
+  .block > ul{margin:0; padding:0 22px 0 36px; list-style:disc;}
+  .block > p{margin:0 22px 8px;}
   .block ul ul{
     list-style:circle;
     margin-top:6px;
@@ -294,26 +300,9 @@
   .block li:last-child{margin-bottom:0;}
   .block p{margin:0 0 8px;}
   .block p:last-child{margin-bottom:0;}
-  .block strong{color:#1a1414;}
-  /* primeiro nível de item = sub-categoria, em destaque âmbar */
-  .block > ul > li{
-    color:#b8540a;
-    font-weight:700;
-  }
-  .block > ul > li > strong:first-child{color:#b8540a;}
-  .block > ul > li > p > strong:first-child{color:#b8540a;}
-  /* itens aninhados = fármacos/orientações, texto neutro */
-  .block ul ul li{
-    color:#2a2424;
-    font-weight:400;
-  }
-  .block ul ul li strong{color:#1a1414; font-weight:700;}
-  .block em{
-    color:var(--red-deep);
-    font-style:normal;
-    text-decoration:underline;
-    text-decoration-color:rgba(179,18,42,0.45);
-  }
+  .block strong{color:#1a1414; font-weight:700;}
+  .block ul ul li{font-weight:400;}
+  .block em{font-style:italic; color:inherit;}
   mark{background:var(--red); color:#fff; padding:0 2px; border-radius:2px;}
 
   .empty-content{
