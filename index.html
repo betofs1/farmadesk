@@ -303,6 +303,23 @@
   .block strong{color:#1a1414; font-weight:700;}
   .block ul ul li{font-weight:400;}
   .block em{font-style:italic; color:inherit;}
+  .block u{text-decoration:underline;}
+  .block s{text-decoration:line-through; opacity:.75;}
+  .block mark{background:#ffe17a; color:#2a2424; padding:0 3px; border-radius:2px;}
+  .drug-img-link{
+    display:inline-flex;
+    align-items:center;
+    margin-left:5px;
+    color:var(--muted);
+    opacity:0.6;
+    vertical-align:middle;
+    transition:opacity .15s, color .15s;
+    text-decoration:none;
+  }
+  .drug-img-link:hover{
+    opacity:1;
+    color:var(--red);
+  }
   mark{background:var(--red); color:#fff; padding:0 2px; border-radius:2px;}
 
   .empty-content{
@@ -664,6 +681,32 @@ function highlight(text, q){
   }catch(e){return text;}
 }
 
+function injectDrugLinks(){
+  // Injeta ícone de busca Google Imagens nos nomes de medicamentos
+  // Alvo: <strong> dentro de li que estão na seção de Posologia (block-label contendo "Posologia")
+  document.querySelectorAll('.card-body .block').forEach(block => {
+    const label = block.querySelector('.block-label');
+    if(!label) return;
+    if(!/posologia/i.test(label.textContent)) return;
+    // todos os <strong> nos itens de lista da posologia
+    block.querySelectorAll('li strong').forEach(strong => {
+      if(strong.dataset.linked) return; // já processado
+      const drugName = strong.textContent.replace(/[()]/g,' ').trim();
+      if(drugName.length < 4) return; // ignora siglas muito curtas
+      const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(drugName + ' embalagem medicamento')}`;
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.title = `Ver foto: ${drugName}`;
+      link.className = 'drug-img-link';
+      link.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+      strong.dataset.linked = '1';
+      strong.after(link);
+    });
+  });
+}
+
 function render(filter){
   const q = (filter || '').trim().toLowerCase();
   let filtered = allConditions;
@@ -697,6 +740,9 @@ function render(filter){
   document.querySelectorAll('.card-head').forEach(head => {
     head.addEventListener('click', () => {
       head.parentElement.classList.toggle('open');
+      if(head.parentElement.classList.contains('open')){
+        injectDrugLinks();
+      }
     });
   });
 
