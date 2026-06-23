@@ -309,16 +309,29 @@
   .drug-img-link{
     display:inline-flex;
     align-items:center;
-    margin-left:5px;
-    color:var(--muted);
-    opacity:0.6;
+    justify-content:center;
+    margin-left:6px;
+    color:#fff;
+    background:var(--red);
+    border-radius:5px;
+    padding:2px 5px;
+    opacity:0.92;
     vertical-align:middle;
-    transition:opacity .15s, color .15s;
+    transition:opacity .15s, background .15s, transform .12s;
     text-decoration:none;
+    box-shadow:0 1px 4px rgba(226,35,63,0.35);
+    gap:3px;
+    font-size:10px;
+    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-weight:700;
+    line-height:1;
+    white-space:nowrap;
   }
   .drug-img-link:hover{
     opacity:1;
-    color:var(--red);
+    background:var(--red-bright);
+    transform:translateY(-1px);
+    box-shadow:0 3px 8px rgba(226,35,63,0.5);
   }
   mark{background:var(--red); color:#fff; padding:0 2px; border-radius:2px;}
 
@@ -588,11 +601,11 @@
 
 <!-- MODAL CALCULADORA PEDIÁTRICA -->
 <div class="modal-overlay" id="calcOverlay">
-  <div class="modal">
+  <div class="modal" style="max-width:560px;">
     <div class="modal-head">
       <div>
-        <h3>Calculadora pediátrica</h3>
-        <p>Dose por peso e idade — em construção</p>
+        <h3>Calculadora Pediátrica</h3>
+        <p>Dose por peso — baseada em bulas e diretrizes (ANVISA/SBP/OMS)</p>
       </div>
       <button class="modal-close" id="closeCalc" type="button">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -600,30 +613,39 @@
     </div>
     <div class="modal-body">
       <div class="field-row">
+        <label for="calcCategory">Categoria</label>
+        <select id="calcCategory">
+          <option value="">— Selecione a categoria —</option>
+          <option value="analgesicos">Analgésicos / Antitérmicos</option>
+          <option value="aines">AINEs</option>
+          <option value="antibioticos">Antibióticos</option>
+          <option value="antialergicos">Anti-histamínicos</option>
+          <option value="antitussivos">Antitussivos / Mucolíticos</option>
+          <option value="gastrointestinal">Gastrointestinal</option>
+          <option value="antifungicos">Antifúngicos</option>
+          <option value="antiparasitarios">Antiparasitários</option>
+          <option value="outros">Outros</option>
+        </select>
+      </div>
+      <div class="field-row">
         <label for="calcDrug">Fármaco</label>
-        <select id="calcDrug">
-          <option>Selecione um fármaco…</option>
-          <option>Dipirona</option>
-          <option>Paracetamol</option>
-          <option>Ibuprofeno</option>
-          <option>Amoxicilina</option>
+        <select id="calcDrug" disabled>
+          <option value="">— Selecione a categoria primeiro —</option>
         </select>
       </div>
       <div class="two-col">
         <div class="field-row">
-          <label for="calcAge">Idade</label>
-          <input id="calcAge" type="number" min="0" placeholder="ex.: 1 ano">
+          <label for="calcAge">Idade (anos)</label>
+          <input id="calcAge" type="number" min="0" max="18" step="0.5" placeholder="ex.: 2">
         </div>
         <div class="field-row">
           <label for="calcWeight">Peso (kg)</label>
-          <input id="calcWeight" type="number" min="0" step="0.1" placeholder="ex.: 12">
+          <input id="calcWeight" type="number" min="0" max="100" step="0.1" placeholder="ex.: 12">
         </div>
       </div>
-      <div class="calc-result">
-        Cálculo de dose ainda não configurado para este fármaco.<br>
-        As tabelas de dose/kg serão adicionadas em breve.
-      </div>
-      <div class="calc-note">Esta ferramenta é um apoio de cálculo e não substitui a checagem da bula e do julgamento clínico individualizado. Os parâmetros de dose por kg serão inseridos posteriormente.</div>
+      <button id="calcBtn" style="width:100%;margin-top:4px;background:var(--red);color:#fff;border:none;padding:10px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Calcular dose</button>
+      <div class="calc-result" id="calcResult" style="display:none;"></div>
+      <div class="calc-note">⚠️ Apoio de cálculo exclusivo para profissionais de saúde. Sempre confirmar na bula oficial vigente (ANVISA). Não substitui avaliação clínica individualizada. Doses máximas absolutas devem ser respeitadas independentemente do peso.</div>
     </div>
   </div>
 </div>
@@ -681,26 +703,106 @@ function highlight(text, q){
   }catch(e){return text;}
 }
 
+// Palavras que NÃO são nomes de medicamentos — são categorias/subtítulos/subgrupos
+const NON_DRUG_PATTERNS = [
+  /^associa[çc][oõ]es?/i,
+  /^antivirais?\s+espec[íi]ficos?/i,
+  /^corticoid[eo]s?\s+(t[oó]picos?|nasais?|orais?|sist[eê]micos?|inalat[oó]rios?)/i,
+  /^corticoid[eo]s?\s+e\s+/i,
+  /^antibiot[ei]coterapia/i,
+  /^antibact[eé]riano/i,
+  /^antibi[oó]ticos?\s+(principais?|orais?|ambulatorial|inalat[oó]rios?)/i,
+  /^antif[uú]ngico[s]?\s+(t[oó]pico|vaginal|oral)/i,
+  /^antifúngicos?\s*[/:]/i,
+  /^lavagem\s+nasal/i,
+  /^descongestionantes?\s+(e|nasais?|t[oó]pico)/i,
+  /^anti.hist[aâ]min[i]?cos?/i,
+  /^broncodilatador/i,
+  /^[aá]lívio/i,
+  /^alívio\s+t[oó]pico/i,
+  /^uso\s+t[oó]pico/i,
+  /^(sintom[aá]tico|expectorante|mucolítico|anti.inflamat|analgés|laxante|emoliente|venoativo|venoativos?|probiótico)[s]?\s*(tópico|oral|simples|principal|fecal)?/i,
+  /^ressalato\s+de/i,
+  /^terapia\s+(hospitalar|para|de)/i,
+  /^manutenção/i,
+  /^profilaxia/i,
+  /^tratamento/i,
+  /^(suporte|resgate|ataque|manuten|contin)/i,
+  /exigem?\s+prescrição/i,
+  /exclusivo\s+unidade/i,
+  /^opções?\s+(seguras?|de)/i,
+  /^fibras?$/i,
+  /^osmótic/i,
+  /^inalat[oó]rios?$/i,
+  /^sistêmico$/i,
+  /^soro\s+fisio/i,
+  /^(outros|outras)\s+opç/i,
+  /^[A-ZÁÉÍÓÚÂÊÎÔÛÃÕ\s]{8,}$/, // apenas maiúsculas e espaços → label de seção
+];
+
+function isDrugName(text) {
+  const t = text.trim();console.log('TESTANDO:', JSON.stringify(t));
+  if (t.length < 3) return false;
+  // Se começa com verbo no imperativo ou parece instrução, não é medicamento
+  if (/^(tomar|aplicar|fazer|usar|inalar|dilui[r]|pingar|coloc[a-z])/i.test(t)) return false;
+  for (const pat of NON_DRUG_PATTERNS) {
+    if (pat.test(t)) return false;
+  }
+  // Deve ter pelo menos uma letra maiúscula no início (nome próprio de med) ou conter dose/conc
+  // Ou ser um nome farmacológico reconhecível (genérico em minúsculo também vale)
+  return true;
+}
+
 function injectDrugLinks(){
-  // Injeta ícone de busca Google Imagens nos nomes de medicamentos
-  // Alvo: <strong> dentro de li que estão na seção de Posologia (block-label contendo "Posologia")
   document.querySelectorAll('.card-body .block').forEach(block => {
     const label = block.querySelector('.block-label');
     if(!label) return;
-    if(!/posologia/i.test(label.textContent)) return;
-    // todos os <strong> nos itens de lista da posologia
-    block.querySelectorAll('li strong').forEach(strong => {
-      if(strong.dataset.linked) return; // já processado
-      const drugName = strong.textContent.replace(/[()]/g,' ').trim();
-      if(drugName.length < 4) return; // ignora siglas muito curtas
-      const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(drugName + ' embalagem medicamento')}`;
+    if(!/posologia|indica[çc][õo]es?/i.test(label.textContent)) return;
+
+    block.querySelectorAll('li strong, li > strong').forEach(strong => {
+      if(strong.dataset.linked) return;
+      const rawText = Array.from(strong.childNodes)
+  .filter(n => n.nodeType === 3)
+  .map(n => n.nodeValue)
+  .join('')
+  .trim();
+if (!rawText) return;
+
+const parentLi = strong.closest('li');
+if (parentLi && parentLi.querySelector('ul')) {
+strong.style.background = '#ffe17a';
+strong.style.color = '#1a1414';
+strong.style.borderRadius = '3px';
+strong.style.padding = '0 3px';
+  strong.dataset.linked = 'skip';
+  return;
+}
+
+
+      // Extrai nomes separados por / (ex: "Resfenol / Cimegripe / Multigrip")
+      const parts = rawText.split(/\s*\/\s*/);
+      let inserted = false;
+
+      // Verifica se a strong contém nomes de medicamentos (qualquer parte)
+      const drugParts = parts.filter(p => isDrugName(p.replace(/\([^)]*\)/g,'').trim()));
+
+      if(drugParts.length === 0) {
+        strong.dataset.linked = 'skip';
+        return;
+      }
+
+      // Para cada nome de medicamento na lista, inserir ícone após a strong correspondente
+      // Estratégia: inserir apenas 1 ícone agrupado logo após o <strong> completo
+      // O link busca todos os nomes detectados
+      const mainDrug = drugParts[0].replace(/\s+\d+\s*(mg|mcg|ml|g|%|ui|mL|mg\/mL)\s*.*$/i,'').trim();
+      const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(mainDrug + ' embalagem medicamento')}`;
       const link = document.createElement('a');
       link.href = url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.title = `Ver foto: ${drugName}`;
+      link.title = `🔍 Ver embalagem: ${mainDrug}`;
       link.className = 'drug-img-link';
-      link.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`;
+      link.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg> foto`;
       strong.dataset.linked = '1';
       strong.after(link);
     });
@@ -779,11 +881,673 @@ consentBtn.addEventListener('click', () => {
   consentOverlay.classList.remove('open');
 });
 
-// Modal calculadora pediátrica
+// ============================================================
+// CALCULADORA PEDIÁTRICA — Base de dados de fármacos
+// Fontes: bulas ANVISA, SBP, OMS, Taketomo (Pediatric Dosage Handbook)
+// ============================================================
+const DRUG_DB = {
+  analgesicos: [
+    {
+      name: 'Dipirona (Metamizol)',
+      dosePerKg: 15, unit: 'mg/kg/dose', interval: '6/6h',
+      maxDose: 1000, maxDoseUnit: 'mg/dose', maxDaily: 4000,
+      minAge: 0.5, // >3 meses
+      forms: [
+        { label: 'Gotas 500mg/mL (25mg/gota)', mgPerMl: 500, dropsPerMl: 20 },
+        { label: 'Suspensão 50mg/mL', mgPerMl: 50 },
+        { label: 'Comprimido 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Contraindicado <3 meses ou <5kg. Dose: 15mg/kg/dose (mín 15 mg). Bula Medley/EMS.',
+      source: 'Bula ANVISA – Dipirona Sódica'
+    },
+    {
+      name: 'Paracetamol (Acetaminofeno)',
+      dosePerKg: 15, unit: 'mg/kg/dose', interval: '6/6h',
+      maxDose: 750, maxDoseUnit: 'mg/dose', maxDaily: 3000,
+      minAge: 0,
+      forms: [
+        { label: 'Gotas 200mg/mL (10mg/gota)', mgPerMl: 200, dropsPerMl: 20 },
+        { label: 'Suspensão 32mg/mL', mgPerMl: 32 },
+        { label: 'Comprimido 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Neonatos: 10–15mg/kg/dose. >1 ano: 15mg/kg/dose (máx 750mg). Intervalo mínimo: 4h. Bula ANVISA.',
+      source: 'Bula ANVISA – Paracetamol; SBP 2023'
+    }
+  ],
+  aines: [
+    {
+      name: 'Ibuprofeno',
+      dosePerKg: 10, unit: 'mg/kg/dose', interval: '6/6h–8/8h',
+      maxDose: 400, maxDoseUnit: 'mg/dose', maxDaily: 1200,
+      minAge: 0.5, // >6 meses
+      forms: [
+        { label: 'Suspensão 50mg/mL', mgPerMl: 50 },
+        { label: 'Comprimido 200mg', mgPerUnit: 200 },
+        { label: 'Comprimido 400mg', mgPerUnit: 400 }
+      ],
+      note: 'Contraindicado <6 meses. Dose: 5–10mg/kg/dose. Para febre: 5–10mg/kg. Para dor: 10mg/kg. Bula ANVISA/SBP.',
+      source: 'Bula ANVISA – Ibuprofeno; SBP Febre 2023'
+    },
+    {
+      name: 'Naproxeno',
+      dosePerKg: 5, unit: 'mg/kg/dose', interval: '8/8h–12/12h',
+      maxDose: 250, maxDoseUnit: 'mg/dose', maxDaily: 1000,
+      minAge: 2,
+      forms: [
+        { label: 'Comprimido 250mg', mgPerUnit: 250 },
+        { label: 'Suspensão 25mg/mL', mgPerMl: 25 }
+      ],
+      note: 'Indicado >2 anos. Dose: 5mg/kg/dose a cada 8–12h. Máx 1g/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Naproxeno'
+    },
+    {
+      name: 'Nimesulida',
+      dosePerKg: 1.5, unit: 'mg/kg/dose', interval: '12/12h',
+      maxDose: 100, maxDoseUnit: 'mg/dose', maxDaily: 200,
+      minAge: 3,
+      forms: [
+        { label: 'Suspensão 10mg/mL', mgPerMl: 10 },
+        { label: 'Comprimido 100mg', mgPerUnit: 100 }
+      ],
+      note: 'Indicado ≥3 anos. Dose: 1,5mg/kg/dose de 12/12h. Máx 5mg/kg/dia. Evitar em <12 anos por hepatotoxicidade (uso restrito). Bula ANVISA.',
+      source: 'Bula ANVISA – Nimesulida; RDC 204/2017'
+    }
+  ],
+  antibioticos: [
+    {
+      name: 'Amoxicilina',
+      dosePerKg: 50, unit: 'mg/kg/dia', interval: '8/8h (÷3 doses)',
+      maxDose: 500, maxDoseUnit: 'mg/dose', maxDaily: 1500,
+      minAge: 0,
+      forms: [
+        { label: 'Suspensão 250mg/5mL (50mg/mL)', mgPerMl: 50 },
+        { label: 'Cápsula 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Dose padrão: 40–50mg/kg/dia ÷ 3 doses. Otite/pneumonia grave: até 80–90mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Amoxicilina; SBMFC 2022'
+    },
+    {
+      name: 'Amoxicilina + Clavulanato',
+      dosePerKg: 45, unit: 'mg/kg/dia (amoxicilina)', interval: '8/8h (÷3 doses)',
+      maxDose: 500, maxDoseUnit: 'mg/dose (amox)', maxDaily: 1500,
+      minAge: 0.25,
+      forms: [
+        { label: 'Suspensão 250/62,5mg/5mL', mgPerMl: 50 },
+        { label: 'Comprimido 500/125mg', mgPerUnit: 500 }
+      ],
+      note: 'Dose referência ao componente amoxicilina: 45mg/kg/dia ÷ 3. Clavulanato máx: 10mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Amoxicilina + Clavulanato'
+    },
+    {
+      name: 'Azitromicina',
+      dosePerKg: 10, unit: 'mg/kg/dia', interval: '1x/dia por 3–5 dias',
+      maxDose: 500, maxDoseUnit: 'mg/dia', maxDaily: 500,
+      minAge: 0.5,
+      forms: [
+        { label: 'Suspensão 200mg/5mL (40mg/mL)', mgPerMl: 40 },
+        { label: 'Comprimido 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Dose: 10mg/kg/dia 1x/dia (máx 500mg/dia). Faringite: 12mg/kg/dia. Duração: 3–5 dias. Bula ANVISA.',
+      source: 'Bula ANVISA – Azitromicina; SBP ORL 2022'
+    },
+    {
+      name: 'Cefalexina',
+      dosePerKg: 50, unit: 'mg/kg/dia', interval: '6/6h (÷4 doses)',
+      maxDose: 500, maxDoseUnit: 'mg/dose', maxDaily: 2000,
+      minAge: 0,
+      forms: [
+        { label: 'Suspensão 250mg/5mL (50mg/mL)', mgPerMl: 50 },
+        { label: 'Cápsula 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Dose: 25–50mg/kg/dia ÷ 4. Infecções graves: até 100mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Cefalexina'
+    },
+    {
+      name: 'Claritromicina',
+      dosePerKg: 15, unit: 'mg/kg/dia', interval: '12/12h (÷2 doses)',
+      maxDose: 250, maxDoseUnit: 'mg/dose', maxDaily: 1000,
+      minAge: 0.5,
+      forms: [
+        { label: 'Suspensão 125mg/5mL (25mg/mL)', mgPerMl: 25 },
+        { label: 'Suspensão 250mg/5mL (50mg/mL)', mgPerMl: 50 }
+      ],
+      note: 'Dose: 15mg/kg/dia ÷ 2 doses (máx 500mg/dose). Bula ANVISA.',
+      source: 'Bula ANVISA – Claritromicina'
+    },
+    {
+      name: 'Nitrofurantoína',
+      dosePerKg: 5, unit: 'mg/kg/dia', interval: '6/6h (÷4 doses)',
+      maxDose: 100, maxDoseUnit: 'mg/dose', maxDaily: 400,
+      minAge: 1,
+      forms: [
+        { label: 'Cápsula 100mg', mgPerUnit: 100 },
+        { label: 'Suspensão 5mg/mL', mgPerMl: 5 }
+      ],
+      note: 'Indicado >1 mês. Dose: 5–7mg/kg/dia ÷ 4. Profilaxia ITU: 1mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Nitrofurantoína; SBP Urologia 2021'
+    },
+    {
+      name: 'Sulfametoxazol + Trimetoprima (SMX-TMP)',
+      dosePerKg: 8, unit: 'mg/kg/dia (TMP)', interval: '12/12h (÷2 doses)',
+      maxDose: 160, maxDoseUnit: 'mg/dose (TMP)', maxDaily: 320,
+      minAge: 2,
+      forms: [
+        { label: 'Suspensão 200/40mg/5mL (TMP 8mg/mL)', mgPerMl: 8 },
+        { label: 'Comprimido 400/80mg (TMP 80mg)', mgPerUnit: 80 }
+      ],
+      note: 'Dose baseada no TMP: 8–10mg/kg/dia ÷ 2. Contraind. <2 meses. Bula ANVISA.',
+      source: 'Bula ANVISA – Sulfametoxazol+Trimetoprima'
+    },
+    {
+      name: 'Metronidazol',
+      dosePerKg: 15, unit: 'mg/kg/dia', interval: '8/8h (÷3 doses)',
+      maxDose: 500, maxDoseUnit: 'mg/dose', maxDaily: 1500,
+      minAge: 0,
+      forms: [
+        { label: 'Suspensão 40mg/mL', mgPerMl: 40 },
+        { label: 'Comprimido 250mg', mgPerUnit: 250 }
+      ],
+      note: 'Anaeróbios/parasitas: 15–35mg/kg/dia ÷ 3. Giardíase: 15mg/kg/dia por 5–7 dias. Bula ANVISA.',
+      source: 'Bula ANVISA – Metronidazol; SBP GI 2021'
+    }
+  ],
+  antialergicos: [
+    {
+      name: 'Loratadina',
+      dosePerKg: null, unit: 'dose fixa por peso', interval: '1x/dia',
+      minAge: 2,
+      fixedDoses: [
+        { label: '2–12 anos, <30kg', dose: 5, unit: 'mg' },
+        { label: '≥12 anos ou >30kg', dose: 10, unit: 'mg' }
+      ],
+      forms: [
+        { label: 'Xarope 1mg/mL', mgPerMl: 1 },
+        { label: 'Comprimido 10mg', mgPerUnit: 10 }
+      ],
+      note: '<30kg: 5mg/dia (5mL xarope); >30kg: 10mg/dia. Não causa sono. Bula ANVISA.',
+      source: 'Bula ANVISA – Loratadina'
+    },
+    {
+      name: 'Desloratadina',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '1x/dia',
+      minAge: 0.5,
+      fixedDoses: [
+        { label: '6–11 meses', dose: 1, unit: 'mg' },
+        { label: '1–5 anos', dose: 1.25, unit: 'mg' },
+        { label: '6–11 anos', dose: 2.5, unit: 'mg' },
+        { label: '≥12 anos', dose: 5, unit: 'mg' }
+      ],
+      forms: [
+        { label: 'Xarope 0,5mg/mL', mgPerMl: 0.5 }
+      ],
+      note: 'Doses fixas por faixa etária. Não causa sono. Bula ANVISA.',
+      source: 'Bula ANVISA – Desloratadina'
+    },
+    {
+      name: 'Cetirizina',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '1x/dia',
+      minAge: 0.5,
+      fixedDoses: [
+        { label: '6–11 meses', dose: 2.5, unit: 'mg' },
+        { label: '1–5 anos', dose: 2.5, unit: 'mg (2x/dia)' },
+        { label: '6–11 anos', dose: 5, unit: 'mg' },
+        { label: '≥12 anos', dose: 10, unit: 'mg' }
+      ],
+      forms: [
+        { label: 'Solução 1mg/mL', mgPerMl: 1 },
+        { label: 'Comprimido 10mg', mgPerUnit: 10 }
+      ],
+      note: 'Pode causar leve sonolência. Bula ANVISA.',
+      source: 'Bula ANVISA – Cetirizina'
+    },
+    {
+      name: 'Dexclorfeniramina (1ª geração)',
+      dosePerKg: 0.15, unit: 'mg/kg/dose', interval: '6/6h–8/8h',
+      maxDose: 2, maxDoseUnit: 'mg/dose', maxDaily: 6,
+      minAge: 2,
+      forms: [
+        { label: 'Xarope 0,4mg/mL', mgPerMl: 0.4 },
+        { label: 'Comprimido 2mg', mgPerUnit: 2 }
+      ],
+      note: 'Causa sedação. Dose: 0,1–0,15mg/kg/dose de 6/6h. Evitar em neonatos. Bula ANVISA.',
+      source: 'Bula ANVISA – Dexclorfeniramina'
+    },
+    {
+      name: 'Fexofenadina',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '12/12h',
+      minAge: 2,
+      fixedDoses: [
+        { label: '2–11 anos', dose: 30, unit: 'mg/dose (2x/dia)' },
+        { label: '≥12 anos', dose: 60, unit: 'mg/dose (2x/dia) ou 180mg 1x/dia' }
+      ],
+      forms: [
+        { label: 'Comprimido 60mg', mgPerUnit: 60 },
+        { label: 'Comprimido 120/180mg', mgPerUnit: 120 }
+      ],
+      note: 'Não causa sono. Evitar em <2 anos. Bula ANVISA.',
+      source: 'Bula ANVISA – Fexofenadina'
+    }
+  ],
+  antitussivos: [
+    {
+      name: 'Dropropizina (antitussivo)',
+      dosePerKg: 1, unit: 'mg/kg/dose', interval: '6/6h–8/8h',
+      maxDose: 30, maxDoseUnit: 'mg/dose', maxDaily: 90,
+      minAge: 2,
+      forms: [
+        { label: 'Xarope 3mg/mL', mgPerMl: 3 },
+        { label: 'Gotas 15mg/mL', mgPerMl: 15, dropsPerMl: 20 }
+      ],
+      note: 'Dose: 1mg/kg/dose de 6/6h–8/8h. Não usar <2 anos. Bula ANVISA.',
+      source: 'Bula ANVISA – Dropropizina'
+    },
+    {
+      name: 'Ambroxol (expectorante)',
+      dosePerKg: 1.2, unit: 'mg/kg/dia', interval: '8/8h–12/12h',
+      maxDose: 15, maxDoseUnit: 'mg/dose', maxDaily: 30,
+      minAge: 0.5,
+      forms: [
+        { label: 'Xarope 15mg/5mL (3mg/mL)', mgPerMl: 3 },
+        { label: 'Gotas 7,5mg/mL', mgPerMl: 7.5 }
+      ],
+      note: '<2 anos: 7,5mg 2x/dia; 2–5 anos: 7,5mg 3x/dia; 6–12 anos: 15mg 3x/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Ambroxol'
+    },
+    {
+      name: 'Acetilcisteína (mucolítico)',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '8/8h–12/12h',
+      minAge: 2,
+      fixedDoses: [
+        { label: '2–5 anos', dose: 100, unit: 'mg/dose 2x/dia' },
+        { label: '6–14 anos', dose: 200, unit: 'mg/dose 2–3x/dia' },
+        { label: '≥14 anos', dose: 600, unit: 'mg/dia dose única (efervescente)' }
+      ],
+      forms: [
+        { label: 'Xarope 20mg/mL', mgPerMl: 20 },
+        { label: 'Sachê 100mg / 200mg / 600mg', mgPerUnit: 100 }
+      ],
+      note: 'Não usar <2 anos. Bula ANVISA.',
+      source: 'Bula ANVISA – Acetilcisteína'
+    },
+    {
+      name: 'Bromexina (expectorante)',
+      dosePerKg: 0.3, unit: 'mg/kg/dose', interval: '8/8h',
+      maxDose: 8, maxDoseUnit: 'mg/dose', maxDaily: 24,
+      minAge: 2,
+      forms: [
+        { label: 'Xarope 4mg/5mL (0,8mg/mL)', mgPerMl: 0.8 }
+      ],
+      note: '<2 anos: evitar. 2–5 anos: 4mg 3x/dia; >5 anos: 8mg 3x/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Bromexina'
+    }
+  ],
+  gastrointestinal: [
+    {
+      name: 'Ondansetrona (antiemético)',
+      dosePerKg: 0.15, unit: 'mg/kg/dose', interval: '8/8h',
+      maxDose: 4, maxDoseUnit: 'mg/dose', maxDaily: 8,
+      minAge: 0.5,
+      forms: [
+        { label: 'Solução 4mg/5mL (0,8mg/mL)', mgPerMl: 0.8 },
+        { label: 'Comprimido ODT 4mg/8mg', mgPerUnit: 4 }
+      ],
+      note: 'Dose: 0,1–0,15mg/kg/dose de 8/8h (máx 4mg/dose). >4 anos: pode usar comp ODT 4mg. Bula ANVISA. Contraindicado em gestantes.',
+      source: 'Bula ANVISA – Ondansetrona; SBP GI 2022'
+    },
+    {
+      name: 'Metoclopramida',
+      dosePerKg: 0.1, unit: 'mg/kg/dose', interval: '8/8h',
+      maxDose: 5, maxDoseUnit: 'mg/dose', maxDaily: 0.5,
+      minAge: 1,
+      forms: [
+        { label: 'Solução 4mg/mL', mgPerMl: 4 },
+        { label: 'Comprimido 10mg', mgPerUnit: 10 }
+      ],
+      note: 'Dose: 0,1mg/kg/dose de 8/8h. Dose máx: 0,5mg/kg/dia. Risco de distonia em crianças — usar com cautela. Bula ANVISA.',
+      source: 'Bula ANVISA – Metoclopramida; ANVISA RDC 2016'
+    },
+    {
+      name: 'Domperidona',
+      dosePerKg: 0.25, unit: 'mg/kg/dose', interval: '8/8h',
+      maxDose: 10, maxDoseUnit: 'mg/dose', maxDaily: 30,
+      minAge: 0.25,
+      forms: [
+        { label: 'Suspensão 1mg/mL', mgPerMl: 1 },
+        { label: 'Comprimido 10mg', mgPerUnit: 10 }
+      ],
+      note: 'Dose: 0,2–0,3mg/kg/dose de 8/8h (antes das refeições). Máx 0,75mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Domperidona'
+    },
+    {
+      name: 'Racecadotrila (antidiarreico)',
+      dosePerKg: 1.5, unit: 'mg/kg/dose', interval: '8/8h',
+      maxDose: 100, maxDoseUnit: 'mg/dose', maxDaily: 300,
+      minAge: 0.25,
+      forms: [
+        { label: 'Sachê 10mg / 30mg / 100mg', mgPerUnit: 30 }
+      ],
+      note: 'Dose: 1,5mg/kg/dose de 8/8h (máx 100mg/dose). Duração: até 7 dias. Seguro em crianças. Bula ANVISA.',
+      source: 'Bula ANVISA – Racecadotrila; OMS Diarrhea 2019'
+    },
+    {
+      name: 'Omeprazol',
+      dosePerKg: 1, unit: 'mg/kg/dia', interval: '1x/dia (manhã, jejum)',
+      maxDose: 20, maxDoseUnit: 'mg/dia', maxDaily: 20,
+      minAge: 1,
+      forms: [
+        { label: 'Cápsula 10mg/20mg', mgPerUnit: 10 },
+        { label: 'Suspensão 2mg/mL (manipulado)', mgPerMl: 2 }
+      ],
+      note: '≥1 ano: 0,7–3,5mg/kg/dia. Usual: 10–20mg/dia. >20kg: 20mg/dia. Bula ANVISA/FDA.',
+      source: 'Bula ANVISA – Omeprazol; FDA Label'
+    },
+    {
+      name: 'Simeticona (gases)',
+      dosePerKg: null, unit: 'dose fixa', interval: '6/6h (após refeições)',
+      minAge: 0,
+      fixedDoses: [
+        { label: '<2 anos (cólica)', dose: 20, unit: 'mg/dose (40 gotas de solução 75mg/mL)' },
+        { label: '2–12 anos', dose: 40, unit: 'mg/dose' },
+        { label: '>12 anos', dose: 80, unit: 'mg/dose' }
+      ],
+      forms: [
+        { label: 'Gotas 75mg/mL', mgPerMl: 75, dropsPerMl: 20 }
+      ],
+      note: 'Para cólica do lactente: 20mg após cada mamada. Bula ANVISA.',
+      source: 'Bula ANVISA – Simeticona'
+    },
+    {
+      name: 'Lactulose (laxativo osmótico)',
+      dosePerKg: 0.7, unit: 'mL/kg/dia', interval: '1x/dia–2x/dia',
+      maxDose: null, maxDoseUnit: 'mL/dia', maxDaily: 30,
+      minAge: 0,
+      forms: [
+        { label: 'Solução 667mg/mL (3,3 kcal/mL)', mgPerMl: 667 }
+      ],
+      note: '<1 ano: 5mL/dia; 1–6 anos: 5–10mL/dia; 7–14 anos: 15mL/dia. Dose em mL (não mg). Bula ANVISA.',
+      source: 'Bula ANVISA – Lactulose; ESPGHAN 2022'
+    }
+  ],
+  antifungicos: [
+    {
+      name: 'Fluconazol',
+      dosePerKg: 6, unit: 'mg/kg/dia', interval: '1x/dia',
+      maxDose: 200, maxDoseUnit: 'mg/dia', maxDaily: 400,
+      minAge: 0.25,
+      forms: [
+        { label: 'Suspensão 10mg/mL', mgPerMl: 10 },
+        { label: 'Cápsula 150mg', mgPerUnit: 150 }
+      ],
+      note: 'Candidíase oral/cutânea: 3–6mg/kg/dia. Infecção sistêmica: 6–12mg/kg/dia. Bula ANVISA.',
+      source: 'Bula ANVISA – Fluconazol'
+    },
+    {
+      name: 'Nistatina (tópica/oral)',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '6/6h',
+      minAge: 0,
+      fixedDoses: [
+        { label: 'Neonatos (candidíase oral)', dose: 200000, unit: 'UI/dose (2mL) 4x/dia' },
+        { label: '>1 mês', dose: 400000, unit: 'UI/dose (4mL) 4x/dia' }
+      ],
+      forms: [
+        { label: 'Suspensão oral 100.000 UI/mL', mgPerMl: 100000 }
+      ],
+      note: 'Candidíase oral: borrifar na boca. Manter por 48h após resolução. Bula ANVISA.',
+      source: 'Bula ANVISA – Nistatina'
+    }
+  ],
+  antiparasitarios: [
+    {
+      name: 'Albendazol',
+      dosePerKg: null, unit: 'dose fixa por peso', interval: 'dose única',
+      minAge: 2,
+      fixedDoses: [
+        { label: '2–12 anos (≤10kg)', dose: 200, unit: 'mg dose única' },
+        { label: '>2 anos (>10kg)', dose: 400, unit: 'mg dose única' }
+      ],
+      forms: [
+        { label: 'Comprimido mastigável 400mg', mgPerUnit: 400 },
+        { label: 'Suspensão 200mg/5mL (40mg/mL)', mgPerMl: 40 }
+      ],
+      note: 'Oxiuríase: repetir em 2 semanas. Giardíase: 400mg/dia por 5 dias. Bula ANVISA.',
+      source: 'Bula ANVISA – Albendazol; SBP Parasitologia 2021'
+    },
+    {
+      name: 'Mebendazol',
+      dosePerKg: null, unit: 'dose fixa', interval: 'dose única ou 3 dias',
+      minAge: 2,
+      fixedDoses: [
+        { label: 'Oxiuríase (dose única)', dose: 100, unit: 'mg (repetir em 2 sem)' },
+        { label: 'Ascaridíase/Ancilostomíase', dose: 100, unit: 'mg 2x/dia por 3 dias' }
+      ],
+      forms: [
+        { label: 'Comprimido 100mg', mgPerUnit: 100 },
+        { label: 'Suspensão 100mg/5mL (20mg/mL)', mgPerMl: 20 }
+      ],
+      note: 'Não indicado <2 anos. Independente do peso. Bula ANVISA.',
+      source: 'Bula ANVISA – Mebendazol'
+    },
+    {
+      name: 'Ivermectina',
+      dosePerKg: 0.2, unit: 'mg/kg/dose', interval: 'dose única (repetir em 7–14 dias)',
+      maxDose: 12, maxDoseUnit: 'mg/dose', maxDaily: 12,
+      minAge: 5, // >15kg
+      forms: [
+        { label: 'Comprimido 6mg', mgPerUnit: 6 }
+      ],
+      note: 'Escabiose: 0,2mg/kg dose única (repetir em 7–14 dias). Contraindicado <15kg (<5 anos aprox.). Bula ANVISA.',
+      source: 'Bula ANVISA – Ivermectina; SBP Dermatologia 2022'
+    },
+    {
+      name: 'Nitazoxanida',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '12/12h por 3 dias',
+      minAge: 1,
+      fixedDoses: [
+        { label: '1–3 anos', dose: 100, unit: 'mg/dose de 12/12h (5mL)' },
+        { label: '4–11 anos', dose: 200, unit: 'mg/dose de 12/12h (10mL)' },
+        { label: '≥12 anos', dose: 500, unit: 'mg/dose de 12/12h' }
+      ],
+      forms: [
+        { label: 'Suspensão 20mg/mL', mgPerMl: 20 },
+        { label: 'Comprimido 500mg', mgPerUnit: 500 }
+      ],
+      note: 'Giardíase e Criptosporidiose. Tomar com alimentos. Bula ANVISA.',
+      source: 'Bula ANVISA – Nitazoxanida'
+    }
+  ],
+  outros: [
+    {
+      name: 'Prednisona / Prednisolona',
+      dosePerKg: 1, unit: 'mg/kg/dia', interval: '1x/dia (manhã)',
+      maxDose: 40, maxDoseUnit: 'mg/dia', maxDaily: 60,
+      minAge: 0,
+      forms: [
+        { label: 'Comprimido 5mg/20mg', mgPerUnit: 5 },
+        { label: 'Solução 1mg/mL (manipulado)', mgPerMl: 1 }
+      ],
+      note: 'Asma/crise alérgica: 1–2mg/kg/dia por 3–5 dias (máx 40mg/dia). Crup: dose única 0,6mg/kg. Bula ANVISA.',
+      source: 'Bula ANVISA – Prednisona; GINA 2023; SBP Asma 2022'
+    },
+    {
+      name: 'Salbutamol spray (Aerolin)',
+      dosePerKg: null, unit: 'doses fixas por crise', interval: 'cada 20min (crise) ou 6/6h (manutenção)',
+      minAge: 0,
+      fixedDoses: [
+        { label: 'Crise leve (<5 anos)', dose: 2, unit: 'jatos de 100mcg com espaçador' },
+        { label: 'Crise moderada/grave', dose: 4, unit: 'jatos de 100mcg repetir a cada 20min (máx 3x)' }
+      ],
+      forms: [
+        { label: 'Spray 100mcg/jato (MDI)', mgPerUnit: 0.1 }
+      ],
+      note: 'Sempre usar com espaçador em <6 anos. Após 3 doses sem melhora: urgência hospitalar. Bula ANVISA/GINA.',
+      source: 'GINA 2023; Bula ANVISA – Salbutamol'
+    },
+    {
+      name: 'Montelucaste',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '1x/dia (noite)',
+      minAge: 0.5,
+      fixedDoses: [
+        { label: '6 meses – 5 anos', dose: 4, unit: 'mg/dia (granulado ou mastigável)' },
+        { label: '6–14 anos', dose: 5, unit: 'mg/dia (mastigável)' },
+        { label: '≥15 anos', dose: 10, unit: 'mg/dia (comprimido)' }
+      ],
+      forms: [
+        { label: 'Sachê granulado 4mg', mgPerUnit: 4 },
+        { label: 'Comprimido mastigável 4mg/5mg', mgPerUnit: 4 }
+      ],
+      note: 'Profilaxia asma e rinite alérgica. Doses fixas por faixa etária. Bula ANVISA.',
+      source: 'Bula ANVISA – Montelucaste; GINA 2023'
+    },
+    {
+      name: 'Dimenidrinato + Piridoxina (Dramin B6)',
+      dosePerKg: null, unit: 'dose fixa por faixa etária', interval: '6/6h–8/8h',
+      minAge: 2,
+      fixedDoses: [
+        { label: '2–4 anos', dose: 15, unit: 'mg/dose (Dramin gotas: 1mg/gota)' },
+        { label: '5–10 anos', dose: 25, unit: 'mg/dose' },
+        { label: '>10 anos', dose: 50, unit: 'mg/dose' }
+      ],
+      forms: [
+        { label: 'Comprimido 50mg', mgPerUnit: 50 },
+        { label: 'Gotas 1mg/gota', mgPerMl: 20 }
+      ],
+      note: 'Cinetose e náuseas. Causa sonolência. Não usar <2 anos. Bula ANVISA.',
+      source: 'Bula ANVISA – Dimenidrinato'
+    },
+    {
+      name: 'Vitamina D3 (Colecalciferol)',
+      dosePerKg: null, unit: 'UI/dia fixo', interval: '1x/dia',
+      minAge: 0,
+      fixedDoses: [
+        { label: '0–12 meses', dose: 400, unit: 'UI/dia (profilaxia)' },
+        { label: '1–18 anos', dose: 600, unit: 'UI/dia (profilaxia)' },
+        { label: 'Deficiência documentada', dose: 2000, unit: 'UI/dia por 3 meses (ajustar)' }
+      ],
+      forms: [
+        { label: 'Gotas 200UI/gota / 400UI/gota', mgPerMl: null }
+      ],
+      note: 'Profilaxia raquitismo: 400 UI/dia (0–12m). Dose terapêutica conforme 25-OH-D sérica. SBP 2022.',
+      source: 'SBP Nutrição 2022; Bula ANVISA – Colecalciferol'
+    },
+    {
+      name: 'Ferro elementar (Sulfato Ferroso)',
+      dosePerKg: 3, unit: 'mg/kg/dia (ferro elementar)', interval: '1x–2x/dia',
+      maxDose: 60, maxDoseUnit: 'mg/dia', maxDaily: 60,
+      minAge: 0,
+      forms: [
+        { label: 'Solução 25mg Fe/mL (Noripurum)', mgPerMl: 25 },
+        { label: 'Comprimido 40mg Fe elementar', mgPerUnit: 40 }
+      ],
+      note: 'Anemia ferropriva: 3–6mg/kg/dia Fe elementar ÷ 1–2 doses. Profilaxia: 1mg/kg/dia. SBP/OMS.',
+      source: 'SBP Hematologia 2021; OMS Iron Supplementation 2016'
+    }
+  ]
+};
+
+// Calculadora pediátrica — lógica
 const calcOverlay = document.getElementById('calcOverlay');
 document.getElementById('openCalc').addEventListener('click', () => calcOverlay.classList.add('open'));
 document.getElementById('closeCalc').addEventListener('click', () => calcOverlay.classList.remove('open'));
 calcOverlay.addEventListener('click', (e) => { if(e.target === calcOverlay) calcOverlay.classList.remove('open'); });
+
+const calcCategoryEl = document.getElementById('calcCategory');
+const calcDrugEl = document.getElementById('calcDrug');
+const calcResultEl = document.getElementById('calcResult');
+
+calcCategoryEl.addEventListener('change', () => {
+  const cat = calcCategoryEl.value;
+  calcDrugEl.innerHTML = '<option value="">— Selecione o fármaco —</option>';
+  calcDrugEl.disabled = !cat;
+  calcResultEl.style.display = 'none';
+  if (cat && DRUG_DB[cat]) {
+    DRUG_DB[cat].forEach((drug, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = drug.name;
+      calcDrugEl.appendChild(opt);
+    });
+  }
+});
+
+calcDrugEl.addEventListener('change', () => { calcResultEl.style.display = 'none'; });
+
+document.getElementById('calcBtn').addEventListener('click', () => {
+  const cat = calcCategoryEl.value;
+  const drugIdx = calcDrugEl.value;
+  const age = parseFloat(document.getElementById('calcAge').value);
+  const weight = parseFloat(document.getElementById('calcWeight').value);
+
+  if (!cat || drugIdx === '') {
+    calcResultEl.style.display = 'block';
+    calcResultEl.innerHTML = '<span style="color:#e2233f">Selecione a categoria e o fármaco.</span>';
+    return;
+  }
+
+  const drug = DRUG_DB[cat][parseInt(drugIdx)];
+
+  if (isNaN(weight) || weight <= 0) {
+    calcResultEl.style.display = 'block';
+    calcResultEl.innerHTML = '<span style="color:#e2233f">Insira o peso da criança (kg).</span>';
+    return;
+  }
+
+  if (!isNaN(drug.minAge) && !isNaN(age) && age < drug.minAge) {
+    calcResultEl.style.display = 'block';
+    calcResultEl.innerHTML = `<span style="color:#e2233f">⚠️ Idade abaixo do limite mínimo recomendado para este fármaco (${drug.minAge} anos). Consulte pediatra.</span>`;
+    return;
+  }
+
+  let html = `<div style="text-align:left;color:#1a1414;">`;
+  html += `<div style="font-weight:700;font-size:15px;color:#0a2533;margin-bottom:10px;">📋 ${drug.name}</div>`;
+
+  if (drug.fixedDoses) {
+    html += `<div style="margin-bottom:8px;"><strong>Doses recomendadas por faixa:</strong></div>`;
+    html += `<ul style="margin:0 0 8px;padding-left:18px;">`;
+    drug.fixedDoses.forEach(fd => {
+      html += `<li><b>${fd.label}:</b> ${fd.dose} ${fd.unit}</li>`;
+    });
+    html += `</ul>`;
+  } else if (drug.dosePerKg) {
+    const rawDose = drug.dosePerKg * weight;
+    const dose = drug.maxDose ? Math.min(rawDose, drug.maxDose) : rawDose;
+    html += `<div style="background:#e8f8f0;border:1px solid #a3d9b8;border-radius:7px;padding:10px 14px;margin-bottom:10px;">`;
+    html += `<div style="font-size:18px;font-weight:700;color:#0a7040;">Dose calculada: <span style="font-size:22px;">${dose.toFixed(1)} ${drug.maxDoseUnit || drug.unit.replace(/\/dose|\/dia/g,'')}</span></div>`;
+    if (rawDose > (drug.maxDose||Infinity)) {
+      html += `<div style="font-size:11px;color:#c0392b;margin-top:4px;">⚠️ Dose calculada (${rawDose.toFixed(1)} mg) excede o máximo recomendado — usando a dose máxima.</div>`;
+    }
+    html += `<div style="font-size:12px;color:#1a6040;margin-top:4px;">Baseado em: ${drug.dosePerKg} ${drug.unit} × ${weight} kg</div>`;
+    html += `</div>`;
+    html += `<div><b>Intervalo:</b> ${drug.interval}</div>`;
+    if (drug.maxDaily) html += `<div><b>Dose diária máxima:</b> ${drug.maxDaily} ${drug.maxDoseUnit||'mg'}/dia</div>`;
+
+    // Volume para formas líquidas
+    if (drug.forms && drug.forms.some(f => f.mgPerMl)) {
+      const liquidForms = drug.forms.filter(f => f.mgPerMl);
+      html += `<div style="margin-top:8px;"><b>Volume equivalente:</b></div><ul style="margin:4px 0 0;padding-left:18px;">`;
+      liquidForms.forEach(f => {
+        const vol = (dose / f.mgPerMl).toFixed(1);
+        if (f.dropsPerMl) {
+          const drops = Math.round(dose / f.mgPerMl * f.dropsPerMl);
+          html += `<li>${f.label}: <b>${drops} gotas</b> (${vol} mL)</li>`;
+        } else {
+          html += `<li>${f.label}: <b>${vol} mL</b></li>`;
+        }
+      });
+      html += `</ul>`;
+    }
+  }
+
+  if (drug.note) {
+    html += `<div style="margin-top:10px;padding:8px 10px;background:#fff7e0;border:1px solid #f0c040;border-radius:6px;font-size:11.5px;color:#6b4900;">📌 ${drug.note}</div>`;
+  }
+  html += `<div style="margin-top:8px;font-size:10.5px;color:#888;">Fonte: ${drug.source}</div>`;
+  html += `</div>`;
+
+  calcResultEl.style.display = 'block';
+  calcResultEl.style.color = 'inherit';
+  calcResultEl.style.textAlign = 'left';
+  calcResultEl.innerHTML = html;
+});
 
 (async function init(){
   countEl.textContent = 'Carregando condições…';
