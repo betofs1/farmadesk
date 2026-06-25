@@ -770,12 +770,18 @@ if (!rawText) return;
 
 const parentLi = strong.closest('li');
 if (parentLi && parentLi.querySelector('ul')) {
-strong.style.background = '#ffe17a';
-strong.style.color = '#1a1414';
-strong.style.borderRadius = '3px';
-strong.style.padding = '0 3px';
-  strong.dataset.linked = 'skip';
-  return;
+  const txt = strong.textContent.trim();
+  const isCategory = /[:\(]$/.test(txt) === false
+    ? NON_DRUG_PATTERNS.some(p => p.test(txt))
+    : true;
+  if (isCategory) {
+    strong.style.background = '#ffe17a';
+    strong.style.color = '#1a1414';
+    strong.style.borderRadius = '3px';
+    strong.style.padding = '0 3px';
+    strong.dataset.linked = 'skip';
+    return;
+  }
 }
 
 
@@ -795,12 +801,12 @@ strong.style.padding = '0 3px';
       // Estratégia: inserir apenas 1 ícone agrupado logo após o <strong> completo
       // O link busca todos os nomes detectados
       const mainDrug = drugParts[0].replace(/\s+\d+\s*(mg|mcg|ml|g|%|ui|mL|mg\/mL)\s*.*$/i,'').trim();
-      const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(mainDrug + ' embalagem medicamento')}`;
+      const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(mainDrug + ' Embalagem do medicamento')}`;
       const link = document.createElement('a');
       link.href = url;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.title = `🔍 Ver embalagem: ${mainDrug}`;
+      link.title = `🔍 Ver embalagem do medicamento: ${mainDrug}`;
       link.className = 'drug-img-link';
       link.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" stroke="none"/><polyline points="21 15 16 10 5 21"/></svg> foto`;
       strong.dataset.linked = '1';
