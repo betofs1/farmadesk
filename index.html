@@ -578,8 +578,8 @@
     <p>As informações aqui reunidas têm caráter informativo e foram compiladas a partir de referências bibliográficas e bulas vigentes na data de elaboração, podendo conter desatualizações, imprecisões ou divergências em relação a alterações regulatórias posteriores (ANVISA, RDCs, atualizações de bula). É responsabilidade do profissional usuário confirmar posologia, contraindicações e interações na bula oficial vigente e em fontes regulatórias atualizadas antes de qualquer orientação ao paciente.</p>
     <p>O uso deste material é de inteira responsabilidade do usuário. O autor não se responsabiliza por decisões clínicas, dispensações ou orientações realizadas com base, total ou parcial, neste conteúdo, tampouco por uso indevido, fora do contexto profissional para o qual foi concebido.</p>
     <p class="legal-meta">Material de uso pessoal e não comercial, em desenvolvimento contínuo.</p>
-    <p style="margin-top:10px;font-size:10px;color:rgba(255,255,255,0.35);text-align:center;letter-spacing:0.3px;">Idealizado por Valberto — Farmacêutico | CRF-RN 7652</p>
   </div>
+  <p style="margin-top:14px;font-size:11px;color:var(--red);text-align:center;letter-spacing:0.4px;font-weight:600;">Idealizado por Valberto Ferreira — Farmacêutico | CRF-RN 7652</p>
 </footer>
 
 <!-- MODAL DE CONSENTIMENTO -->
@@ -852,8 +852,13 @@ function render(filter){
 
   document.querySelectorAll('.card-head').forEach(head => {
     head.addEventListener('click', () => {
-      head.parentElement.classList.toggle('open');
-      if(head.parentElement.classList.contains('open')){
+      const card = head.parentElement;
+      const isOpen = card.classList.contains('open');
+      // Fechar todas as outras condições abertas
+      document.querySelectorAll('.card.open').forEach(c => c.classList.remove('open'));
+      // Alternar a atual
+      if(!isOpen){
+        card.classList.add('open');
         injectDrugLinks();
       }
     });
