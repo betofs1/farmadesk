@@ -529,13 +529,13 @@
       <div class="brand-wordmark">
         <img src="marca.png" alt="FarmaDesk">
       </div>
-      <div class="subtitle">Guia Rápido de Dispensação e Orientação Farmacêutica</div>
+      <div class="subtitle">Indicação, Dispensação e Orientação Farmacêutica</div>
     </div>
     <div class="top-actions">
-      <button class="btn-top" id="openCalc" type="button">
+      <a class="btn-top" href="https://betofs1.github.io/dosespediatricas/" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
         Calculadora pediátrica
-      </button>
+      </a>
       <a class="btn-top ghost" href="https://consultas.anvisa.gov.br/#/bulario/" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
         Bulário ANVISA
@@ -1462,7 +1462,6 @@ const DRUG_DB = {
 
 // Calculadora pediátrica — lógica
 const calcOverlay = document.getElementById('calcOverlay');
-document.getElementById('openCalc').addEventListener('click', () => calcOverlay.classList.add('open'));
 document.getElementById('closeCalc').addEventListener('click', () => calcOverlay.classList.remove('open'));
 calcOverlay.addEventListener('click', (e) => { if(e.target === calcOverlay) calcOverlay.classList.remove('open'); });
 
