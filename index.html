@@ -113,40 +113,65 @@
   .search-wrap{
     background:var(--card);
     border:1px solid var(--rule);
-    border-radius:10px;
+    border-radius:12px;
     box-shadow:0 10px 24px rgba(0,0,0,0.35);
-    padding:14px 16px;
+    padding:10px 10px 10px 18px;
     display:flex;
-    gap:12px;
+    gap:8px;
     align-items:center;
     font-family:"Helvetica Neue",Arial,sans-serif;
   }
-  .search-wrap svg{flex-shrink:0;color:var(--red);opacity:.9;}
   #search{
     border:none;
     outline:none;
     background:transparent;
     flex:1;
-    font-size:15px;
+    font-size:14.5px;
     font-family:inherit;
     color:var(--ink);
+    min-width:0;
   }
-  #search::placeholder{color:#d1ced0;}
+  #search::placeholder{color:#6a6a7a;}
   .clear-btn{
-    display:none;
+    display:flex;
     align-items:center;
     justify-content:center;
-    width:24px;height:24px;
-    border:none;
-    border-radius:50%;
-    background:var(--paper-dim);
+    gap:5px;
+    height:38px;
+    padding:0 14px;
+    border:1.5px solid var(--rule);
+    border-radius:8px;
+    background:transparent;
     color:var(--muted);
     cursor:pointer;
     flex-shrink:0;
-    transition:background .15s ease, color .15s ease;
+    font-size:13px;
+    font-family:inherit;
+    font-weight:600;
+    transition:border-color .15s, color .15s;
+    white-space:nowrap;
   }
-  .clear-btn:hover{background:var(--red-deep); color:#fff;}
+  .clear-btn:hover{border-color:var(--red); color:var(--red);}
   .clear-btn.show{display:flex;}
+    display:flex;
+    align-items:center;
+    gap:6px;
+    height:38px;
+    padding:0 18px;
+    border:none;
+    border-radius:8px;
+    background:var(--red);
+    color:#fff;
+    cursor:pointer;
+    flex-shrink:0;
+    font-size:13px;
+    font-family:inherit;
+    font-weight:700;
+    transition:background .15s, transform .1s;
+    white-space:nowrap;
+  }
+  .search-btn:hover{background:#c01a32; transform:translateY(-1px);}
+  .search-btn:active{transform:translateY(0);}
   .helper-text{
     font-family:"Helvetica Neue",Arial,sans-serif;
     font-size:11.5px;
@@ -718,10 +743,14 @@
 
   <div class="controls">
     <div class="search-wrap">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input id="search" type="text" placeholder="Busque por sintoma, fármaco ou nome comercial.">
-      <button id="clearSearch" class="clear-btn" type="button" title="Limpar busca" aria-label="Limpar busca">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <input id="search" type="text" placeholder="Ex: Daflon, Diosmina, Monuril, Amoxicilina...">
+      <button id="clearSearch" class="clear-btn" type="button">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        Limpar
+      </button>
+      <button id="searchBtn" class="search-btn" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Buscar
       </button>
     </div>
     
@@ -1037,11 +1066,13 @@ function render(filter){
   }
 
   let filtered = allConditions;
-  if(activeSystem && activeSystem !== 'all'){
-    filtered = filtered.filter(c => c.systemSlug === activeSystem);
-  }
   if(q){
-    filtered = filtered.filter(c => (c.title + ' ' + c.html.replace(/<[^>]+>/g,' ')).toLowerCase().includes(q));
+    // Busca global — ignora filtro de sistema, busca em título e conteúdo
+    filtered = filtered.filter(c =>
+      (c.title + ' ' + (c.html||'').replace(/<[^>]+>/g,' ')).toLowerCase().includes(q)
+    );
+  } else if(activeSystem && activeSystem !== 'all'){
+    filtered = filtered.filter(c => c.systemSlug === activeSystem);
   }
 
   countEl.textContent = `${filtered.length} de ${allConditions.length} condições`;
@@ -1103,11 +1134,18 @@ function render(filter){
     body.className = 'card-body';
     const inner = document.createElement('div');
     inner.className = 'body-inner';
-    inner.innerHTML = c.html || '<div class="empty-content">Conteúdo em preparação.</div>';
+    inner.innerHTML = q
+      ? (c.html || '<div class="empty-content">Conteúdo em preparação.</div>').replace(
+          new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),
+          '<mark>$1</mark>'
+        )
+      : (c.html || '<div class="empty-content">Conteúdo em preparação.</div>');
     body.appendChild(inner);
 
     article.appendChild(head);
     article.appendChild(body);
+    // Expandir automaticamente se há busca ativa
+    if(q) article.classList.add('open');
     cardsEl.appendChild(article);
   });
 
@@ -1255,9 +1293,15 @@ searchEl.addEventListener('input', e => {
 });
 clearBtn.addEventListener('click', () => {
   searchEl.value = '';
+  activeSystem = null;
   render('');
   toggleClearBtn();
   searchEl.focus();
+});
+
+document.getElementById('searchBtn').addEventListener('click', () => {
+  render(searchEl.value);
+  toggleClearBtn();
 });
 
 // Modal de consentimento (primeira visita)
