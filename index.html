@@ -509,6 +509,21 @@
     display:flex;align-items:center;gap:6px;
   }
   .fav-sidebar-title svg{color:#f5c518;}
+  .fav-clear-btn{
+    margin-left:auto;
+    background:transparent;
+    border:1px solid var(--rule);
+    color:var(--muted);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    font-weight:700;
+    padding:3px 8px;
+    border-radius:4px;
+    cursor:pointer;
+    transition:color .15s, border-color .15s;
+  }
+  .fav-clear-btn:hover{color:var(--red); border-color:var(--red);}
   .fav-list{display:flex;flex-direction:column;gap:6px;}
   .fav-item{
     background:var(--card);
@@ -782,6 +797,7 @@
     <div class="fav-sidebar-title">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       Favoritos
+      <button class="fav-clear-btn" id="clearFavsBtn" title="Limpar todos os favoritos">Limpar</button>
     </div>
     <div class="fav-list" id="favList">
       <div class="fav-empty">Nenhum favorito ainda.<br>Clique na ★ de uma condição para salvar.</div>
@@ -1072,6 +1088,7 @@ function render(filter){
         </div>
       </div>`;
     renderSidebar();
+    renderFavs();
     return;
   }
 
@@ -1165,8 +1182,7 @@ function render(filter){
   });
   renderFavs();
 
-
-
+}
 
 // ============================================================
 // FAVORITOS
@@ -1245,12 +1261,23 @@ function removeFav(id){
   if(btn) btn.classList.remove('starred');
 }
 
+function clearFavs(){
+  if(!getFavs().length) return;
+  if(!confirm('Remover todos os favoritos?')) return;
+  saveFavs([]);
+  renderFavs();
+}
+
 // Delegação única para cards (estrela + abertura) — fora do render() para não acumular
 // Delegação para cards — direto no container
 // Listeners adicionados diretamente nos cards via createElement
 
 // Delegação para favoritos e fav-remove — no document (fora do cardsEl)
 document.addEventListener('click', (e) => {
+  if(e.target.closest('#clearFavsBtn')){
+    clearFavs();
+    return;
+  }
   const removeBtn = e.target.closest('.fav-remove');
   if(removeBtn){
     e.stopPropagation();
@@ -1279,8 +1306,6 @@ function openFav(id){
       injectDrugLinks();
     }, 80);
   }
-}
-
 }
 
 const clearBtn = document.getElementById('clearSearch');
