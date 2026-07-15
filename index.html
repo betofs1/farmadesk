@@ -971,6 +971,17 @@ const NON_DRUG_PATTERNS = [
   /^sistêmico$/i,
   /^soro\s+fisio/i,
   /^(outros|outras)\s+opç/i,
+  /^indica[çc][ãa]o(\s+cr[íi]tica)?/i,
+  /^vantage(m|ns)/i,
+  /^desvantage(m|ns)/i,
+  /^contra.?indica[çc][ãaõo]/i,
+  /^mecanismo/i,
+  /^representantes?/i,
+  /^notas?[:.]?$/i,
+  /^defini[çc][ãa]o/i,
+  /^complica[çc][õo]es/i,
+  /^classifica[çc][ãa]o/i,
+  /^passo\s+\d+/i,
   /^[A-ZÁÉÍÓÚÂÊÎÔÛÃÕ\s]{8,}$/, // apenas maiúsculas e espaços → label de seção
 ];
 
