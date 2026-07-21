@@ -153,6 +153,7 @@
   }
   .clear-btn:hover{border-color:var(--red); color:var(--red);}
   .clear-btn.show{display:flex;}
+  .search-btn{
     display:flex;
     align-items:center;
     gap:6px;
@@ -1031,7 +1032,7 @@ if (parentLi && parentLi.querySelector('ul')) {
 
 
       // Extrai nomes separados por / (ex: "Resfenol / Cimegripe / Multigrip")
-      const parts = rawText.split(/\s+\/\s+/);
+      const parts = rawText.split(/\s*\/\s*/);
       let inserted = false;
 
       // Verifica se a strong contém nomes de medicamentos (qualquer parte)
@@ -1045,7 +1046,7 @@ if (parentLi && parentLi.querySelector('ul')) {
       // Para cada nome de medicamento na lista, inserir ícone após a strong correspondente
       // Estratégia: inserir apenas 1 ícone agrupado logo após o <strong> completo
       // O link busca todos os nomes detectados
-      const mainDrug = drugParts[0].replace(/[:\s]+$/,'').trim();
+      const mainDrug = drugParts[0].replace(/\s+\d+\s*(mg|mcg|ml|g|%|ui|mL|mg\/mL)\s*.*$/i,'').trim();
       const url = `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(mainDrug + ' Embalagem do medicamento')}`;
       const link = document.createElement('a');
       link.href = url;
