@@ -271,6 +271,7 @@
     display:flex;
     align-items:center;
     gap:8px;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:12px;
     text-transform:uppercase;
     letter-spacing:.12em;
@@ -290,9 +291,10 @@
   #sysList{
     display:flex;
     flex-direction:column;
-    gap:2px;
+    gap:3px;
   }
   .sys-btn{
+    position:relative;
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -300,28 +302,51 @@
     text-align:left;
     background:none;
     border:none;
-    padding:10px 12px;
+    padding:10px 12px 10px 16px;
     font-size:13.5px;
     color:var(--ink);
     cursor:pointer;
     border-radius:9px;
-    font-family:inherit;
-    transition:background .12s ease, color .12s ease;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
+    font-weight:500;
+    overflow:hidden;
+    transition:background .2s ease, color .2s ease, padding-left .2s ease, box-shadow .2s ease;
   }
-  .sys-btn:hover{background:var(--paper-dim); color:var(--red-bright);}
-  .sys-btn.active{
-    background:rgba(226,35,63,0.14);
+  .sys-btn::before{
+    content:'';
+    position:absolute;
+    left:0; top:2px; bottom:2px;
+    width:3px;
+    border-radius:0 3px 3px 0;
+    background:var(--red-bright);
+    transform:scaleY(0);
+    transform-origin:center;
+    transition:transform .2s ease;
+  }
+  .sys-btn:hover{
+    background:linear-gradient(90deg, rgba(226,35,63,0.13), transparent 85%);
     color:var(--red-bright);
-    font-weight:700;
+    padding-left:20px;
   }
+  .sys-btn:hover::before{transform:scaleY(1);}
+  .sys-btn:active{transform:scale(0.97);}
+  .sys-btn.active{
+    background:linear-gradient(90deg, var(--red) 0%, var(--red-deep) 100%);
+    color:#fff;
+    font-weight:700;
+    padding-left:20px;
+    box-shadow:0 4px 16px rgba(226,35,63,0.4);
+  }
+  .sys-btn.active::before{transform:scaleY(1); background:#fff;}
   .sys-btn .count{
     font-size:11px;
     color:var(--muted);
     background:var(--paper-dim);
     padding:1px 7px;
     border-radius:999px;
+    transition:background .2s ease, color .2s ease;
   }
-  .sys-btn.active .count{background:rgba(226,35,63,0.28);color:var(--red-bright);}
+  .sys-btn.active .count{background:rgba(255,255,255,0.25);color:#fff;}
 
   main{min-width:0;}
   #count{
