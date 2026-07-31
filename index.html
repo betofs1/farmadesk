@@ -118,10 +118,14 @@
     color:#f5f2f0;
     white-space:nowrap;
   }
-  .header-tagline svg{
+  .header-tagline .dot-start{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:var(--red);
+    box-shadow:0 0 0 rgba(226,35,63,0.6);
+    animation:pulseDot 1.8s infinite;
     flex-shrink:0;
-    color:var(--red);
-    filter:drop-shadow(0 0 4px rgba(226,35,63,0.6));
   }
   .header-tagline .pulse-dot{
     width:6px;
@@ -883,7 +887,7 @@
   <div class="header-tagline-row">
     <span class="hr-line left"></span>
     <div class="header-tagline">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="2.5" y="9.5" width="19" height="5" rx="2.5" transform="rotate(-45 12 12)"/><line x1="9.5" y1="9.5" x2="14.5" y2="14.5" transform="rotate(-45 12 12)"/></svg>
+      <span class="dot-start"></span>
       Indicação, Dispensação e Orientação Farmacêutica
       <span class="pulse-dot"></span>
     </div>
