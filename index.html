@@ -29,7 +29,7 @@
     margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:"Iowan Old Style","Georgia","Source Serif Pro",serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     line-height:1.5;
   }
   /* HEADER */
@@ -76,7 +76,7 @@
     margin-top:2px;
   }
   .subtitle{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:13px;
     color:#ffffff;
     margin-top:0;
@@ -110,7 +110,7 @@
     background:linear-gradient(135deg, rgba(226,35,63,0.16), rgba(0,0,0,0.35));
     border:1px solid rgba(226,35,63,0.45);
     box-shadow:0 0 0 1px rgba(0,0,0,0.2) inset, 0 2px 14px rgba(226,35,63,0.18);
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:12.5px;
     font-weight:700;
     letter-spacing:.09em;
@@ -149,7 +149,7 @@
     display:flex;
     gap:10px;
     flex-wrap:wrap;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
   }
   .btn-top{
     display:flex;
@@ -195,7 +195,7 @@
     display:flex;
     gap:8px;
     align-items:center;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
   }
   #search{
     border:none;
@@ -208,6 +208,23 @@
     min-width:0;
   }
   #search::placeholder{color:#6a6a7a;}
+  .search-shortcut-hint{
+    background:var(--paper-dim);
+    border:1px solid var(--rule);
+    border-radius:5px;
+    padding:2px 7px;
+    font-family:monospace;
+    font-size:12px;
+    color:var(--muted);
+    flex-shrink:0;
+    pointer-events:none;
+  }
+  .quick-mode-btn.active{
+    background:var(--red);
+    border-color:var(--red);
+    color:#fff;
+    box-shadow:0 3px 12px rgba(226,35,63,0.4);
+  }
   .clear-btn{
     display:flex;
     align-items:center;
@@ -250,7 +267,7 @@
   .search-btn:hover{background:#c01a32; transform:translateY(-1px);}
   .search-btn:active{transform:translateY(0);}
   .helper-text{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:11.5px;
     color:var(--muted);
     margin:8px 2px 0;
@@ -269,7 +286,7 @@
     position:sticky;
     top:140px;
     align-self:start;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
   }
   .sidebar-title{
     display:flex;
@@ -316,6 +333,10 @@
     overflow:hidden;
     transition:background .2s ease, color .2s ease, padding-left .2s ease, box-shadow .2s ease;
   }
+  .sys-btn-left{display:flex; align-items:center; gap:10px; min-width:0;}
+  .sys-btn-left span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sys-icon{flex-shrink:0; opacity:.6; transition:opacity .2s ease;}
+  .sys-btn:hover .sys-icon, .sys-btn.active .sys-icon{opacity:1;}
   .sys-btn::before{
     content:'';
     position:absolute;
@@ -354,12 +375,32 @@
 
   main{min-width:0;}
   #count{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:12px;
     text-transform:uppercase;
     letter-spacing:.1em;
     color:var(--muted);
     margin-bottom:14px;
+  }
+  .skeleton-card{
+    background:var(--card);
+    border:1px solid var(--rule);
+    border-radius:12px;
+    margin-bottom:14px;
+    padding:18px 20px;
+  }
+  .skeleton-line{
+    height:14px;
+    border-radius:6px;
+    background:linear-gradient(90deg, var(--paper-dim) 25%, var(--rule) 50%, var(--paper-dim) 75%);
+    background-size:200% 100%;
+    animation:skeletonShine 1.4s ease-in-out infinite;
+  }
+  .skeleton-line.tag{width:90px; height:10px; margin-bottom:10px;}
+  .skeleton-line.title{width:60%; height:18px;}
+  @keyframes skeletonShine{
+    0%{background-position:200% 0;}
+    100%{background-position:-200% 0;}
   }
   .card{
     background:var(--card);
@@ -367,9 +408,15 @@
     border-radius:12px;
     margin-bottom:14px;
     overflow:hidden;
-    transition:box-shadow .2s ease;
+    box-shadow:0 2px 10px rgba(0,0,0,0.28);
+    transition:box-shadow .25s ease, border-color .25s ease, transform .15s ease;
   }
-  .card.open{box-shadow:0 8px 22px rgba(0,0,0,0.4);}
+  .card:hover{border-color:rgba(226,35,63,0.35); box-shadow:0 6px 20px rgba(0,0,0,0.4); transform:translateY(-1px);}
+  .card.open{
+    box-shadow:0 14px 34px rgba(0,0,0,0.5), 0 0 0 1px rgba(226,35,63,0.3);
+    border-color:rgba(226,35,63,0.45);
+    transform:none;
+  }
   .card-head{
     padding:16px 20px;
     cursor:pointer;
@@ -381,7 +428,7 @@
   .card-head:hover{background:var(--paper-dim);}
   .head-left{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
   .system-tag{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:10.5px;
     text-transform:uppercase;
     letter-spacing:.09em;
@@ -405,14 +452,15 @@
   .card-body{
     max-height:0;
     overflow:hidden;
-    transition:max-height .32s cubic-bezier(.4,0,.2,1);
+    opacity:0;
+    transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .3s ease;
     background:#f8f9fb;
     border-top:2px solid #e2233f;
   }
-  .card.open .card-body{max-height:6000px;}
+  .card.open .card-body{max-height:6000px; opacity:1; transition:max-height .35s cubic-bezier(.4,0,.2,1), opacity .4s ease .05s;}
   .body-inner{
     padding:4px 0 24px;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:13.5px;
     color:#1a1a2e;
     line-height:1.6;
@@ -534,7 +582,7 @@
     box-shadow:0 1px 4px rgba(226,35,63,0.35);
     gap:3px;
     font-size:10px;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-weight:700;
     line-height:1;
     white-space:nowrap;
@@ -591,7 +639,7 @@
   }
   .wc-item svg{flex-shrink:0;color:var(--red);margin-top:2px;}
   .wc-item div{display:flex;flex-direction:column;gap:4px;}
-  .wc-item strong{font-size:13px;color:var(--ink);font-weight:700;font-family:"Helvetica Neue",Arial,sans-serif;}
+  .wc-item strong{font-size:13px;color:var(--ink);font-weight:700;font-family:'Inter',"Helvetica Neue",Arial,sans-serif;}
   .wc-item span{font-size:12px;color:var(--muted);line-height:1.5;}
 
   /* ESTRELA DE FAVORITO */
@@ -614,7 +662,7 @@
     position:sticky;
     top:140px;
     align-self:start;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
   }
   .fav-sidebar-title{
     font-size:11px;
@@ -672,7 +720,7 @@
 
 
   .empty-content{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:13px;
     color:#75696a;
     background:#e9e2dd;
@@ -687,16 +735,162 @@
     text-align:center;
     padding:60px 20px;
     color:var(--muted);
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
   }
+  .empty-state svg{color:var(--rule); margin-bottom:14px;}
+  .empty-title{font-size:15px; font-weight:700; color:var(--ink); margin:0 0 6px;}
+  .empty-sub{font-size:13px; color:var(--muted); margin:0;}
 
   footer{
     text-align:center;
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     font-size:11.5px;
     color:var(--muted);
     padding:10px 20px 50px;
   }
+  .back-to-top{
+    position:fixed;
+    right:24px;
+    bottom:24px;
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:var(--red);
+    color:#fff;
+    border:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 4px 16px rgba(0,0,0,0.4);
+    opacity:0;
+    visibility:hidden;
+    transform:translateY(10px);
+    transition:opacity .25s ease, transform .25s ease, visibility .25s, background .15s;
+    z-index:60;
+  }
+  .back-to-top.show{opacity:1; visibility:visible; transform:translateY(0);}
+  .back-to-top:hover{background:var(--red-bright);}
+  .source-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    max-width:720px;
+    margin:0 auto 14px;
+    padding:7px 16px;
+    border-radius:999px;
+    background:var(--paper-dim);
+    border:1px solid var(--rule);
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .source-badge svg{color:var(--red-bright); flex-shrink:0;}
+  .footer-links{
+    margin-top:12px;
+    display:flex;
+    justify-content:center;
+    gap:16px;
+  }
+  .footer-links button{
+    background:none;
+    border:none;
+    color:var(--muted);
+    font-size:11.5px;
+    font-family:inherit;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+  }
+  .footer-links button:hover{color:var(--red-bright);}
+  .about-modal .modal-body{font-size:13.5px; line-height:1.65;}
+  .about-modal .modal-body p{margin:0 0 12px;}
+  .about-modal .modal-body h4{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--red-bright);
+    margin:18px 0 8px;
+  }
+  .about-modal .modal-body h4:first-child{margin-top:0;}
+  .about-modal .modal-body ul{margin:0 0 12px; padding-left:20px;}
+  .about-modal .modal-body li{margin-bottom:5px;}
+
+  /* ONBOARDING */
+  .onboarding-modal{max-width:440px; text-align:center;}
+  .onboarding-modal .modal-head{
+    justify-content:flex-end;
+    background:linear-gradient(135deg,#000,var(--red-deep) 140%);
+    padding:12px 14px;
+  }
+  .onboarding-body{padding:8px 28px 30px;}
+  .onboarding-icon{
+    width:56px; height:56px;
+    margin:0 auto 18px;
+    border-radius:50%;
+    background:rgba(226,35,63,0.15);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--red-bright);
+  }
+  .onboarding-body h3{
+    font-size:18px;
+    margin:0 0 10px;
+    color:var(--ink);
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
+  }
+  .onboarding-body p{
+    font-size:13.5px;
+    color:var(--muted);
+    line-height:1.6;
+    margin:0 0 22px;
+  }
+  .onboarding-body kbd{
+    background:var(--paper-dim);
+    border:1px solid var(--rule);
+    border-radius:5px;
+    padding:2px 7px;
+    font-family:monospace;
+    font-size:12px;
+    color:var(--ink);
+  }
+  .onboarding-dots{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-bottom:20px;
+  }
+  .onboarding-dots span{
+    width:6px; height:6px;
+    border-radius:50%;
+    background:var(--rule);
+    transition:background .2s, width .2s;
+  }
+  .onboarding-dots span.active{background:var(--red-bright); width:18px; border-radius:3px;}
+  .onboarding-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .onboarding-skip{
+    background:none; border:none;
+    color:var(--muted);
+    font-size:13px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .onboarding-skip:hover{color:var(--ink);}
+  .onboarding-next{
+    background:var(--red);
+    color:#fff;
+    border:none;
+    padding:10px 22px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    font-family:inherit;
+    transition:background .15s;
+  }
+  .onboarding-next:hover{background:var(--red-deep);}
   .legal-box{
     max-width:720px;
     margin:0 auto;
@@ -738,7 +932,7 @@
     max-height:86vh;
     overflow-y:auto;
     box-shadow:0 24px 60px rgba(0,0,0,0.6);
-    font-family:"Helvetica Neue",Arial,sans-serif;
+    font-family:'Inter',"Helvetica Neue",Arial,sans-serif;
     color:var(--ink);
   }
   .modal-head{
@@ -750,7 +944,7 @@
     align-items:flex-start;
     border-radius:14px 14px 0 0;
   }
-  .modal-head h3{margin:0 0 3px; font-size:17px; font-family:"Iowan Old Style",Georgia,serif;}
+  .modal-head h3{margin:0 0 3px; font-size:17px; font-family:'Inter',"Helvetica Neue",Arial,sans-serif; font-weight:700;}
   .modal-head p{margin:0; font-size:12px; color:#f3c6cd;}
   .modal-close{
     background:rgba(255,255,255,0.15);
@@ -869,14 +1063,10 @@
       </div>
     </a>
     <div class="top-actions">
-      <a class="btn-top" href="https://betofs1.github.io/dosespediatricas/" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="16" y1="15" x2="16.01" y2="15"/></svg>
-        Calculadora pediátrica
-      </a>
-      <a class="btn-top ghost" href="https://consultas.anvisa.gov.br/#/bulario/" target="_blank" rel="noopener">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        Bulário ANVISA
-      </a>
+      <button id="quickModeBtn" class="btn-top ghost quick-mode-btn" type="button" title="Mostra só Indicações e Posologia nos cards abertos">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>
+        Modo Balcão
+      </button>
       <a class="btn-top ghost" href="https://betofs1.github.io/medinter/" target="_blank" rel="noopener">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="9" r="6"/><circle cx="15" cy="15" r="6"/><path d="M13.5 4.5l6 6"/><path d="M4.5 13.5l6 6"/></svg>
         Buscar Equivalentes
@@ -897,6 +1087,7 @@
   <div class="controls">
     <div class="search-wrap">
       <input id="search" type="text" placeholder="Pesquise por condição, medicamento, sintomas">
+      <kbd class="search-shortcut-hint" title="Atalho: tecla /">/</kbd>
       <button id="clearSearch" class="clear-btn" type="button">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         Limpar
@@ -918,7 +1109,11 @@
   <main>
     <div id="count"></div>
     <div id="cards"></div>
-    <div class="empty-state" id="empty" style="display:none;">Nenhuma condição encontrada para essa busca.</div>
+    <div class="empty-state" id="empty" style="display:none;">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg>
+      <p class="empty-title">Nenhuma condição encontrada</p>
+      <p class="empty-sub" id="emptySub">Tente um termo mais genérico ou verifique a ortografia.</p>
+    </div>
   </main>
 
   <aside class="fav-sidebar">
@@ -934,6 +1129,10 @@
 </div>
 
 <footer>
+  <div class="source-badge">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    Conteúdo baseado em bulas ANVISA e protocolos clínicos vigentes
+  </div>
   <div class="legal-box">
     <strong>Aviso Legal e Limitação de Responsabilidade</strong>
     <p>Este material é uma ferramenta de apoio à consulta técnica, destinada exclusivamente a profissionais farmacêuticos e da saúde devidamente habilitados. Não constitui prescrição, diagnóstico ou substituto da avaliação clínica individualizada do paciente.</p>
@@ -941,8 +1140,91 @@
     <p>O uso deste material é de inteira responsabilidade do usuário. O autor não se responsabiliza por decisões clínicas, dispensações ou orientações realizadas com base, total ou parcial, neste conteúdo, tampouco por uso indevido, fora do contexto profissional para o qual foi concebido.</p>
     <p class="legal-meta">Material de uso pessoal e não comercial, em desenvolvimento contínuo. </p>
   </div>
+  <div class="footer-links">
+    <button type="button" id="openAbout">Sobre a metodologia</button>
+  </div>
   <p style="margin-top:14px;font-size:11px;color:var(--red);text-align:center;letter-spacing:0.4px;font-weight:600;">Idealizado por Valberto Ferreira | CRF-RN 7652</p>
 </footer>
+
+<button id="backToTop" class="back-to-top" type="button" title="Voltar ao topo">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+</button>
+
+<!-- MODAL SOBRE A METODOLOGIA -->
+<div class="modal-overlay" id="aboutOverlay">
+  <div class="modal about-modal">
+    <div class="modal-head">
+      <div>
+        <h3>Sobre a metodologia</h3>
+        <p>Como o conteúdo é construído e mantido</p>
+      </div>
+      <button class="modal-close" id="closeAbout" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <h4>Fontes utilizadas</h4>
+      <p>O conteúdo é compilado a partir de bulas oficiais vigentes (ANVISA), protocolos clínicos e diretrizes de sociedades médicas e farmacêuticas de referência (como SBP e OMS), além de literatura técnica consolidada da prática farmacêutica.</p>
+      <h4>Curadoria e revisão</h4>
+      <p>Cada condição é redigida e revisada manualmente antes da publicação, com foco na aplicabilidade prática no balcão da farmácia: sinais de alarme, posologia, alertas de segurança e orientações complementares.</p>
+      <h4>Atualizações</h4>
+      <p>O conteúdo está em desenvolvimento contínuo. Novas condições e correções são publicadas periodicamente conforme revisão de fontes e feedback de uso.</p>
+      <h4>Limitações</h4>
+      <ul>
+        <li>Este material não substitui a bula oficial vigente do medicamento;</li>
+        <li>Não constitui prescrição, diagnóstico ou orientação individualizada de caso clínico;</li>
+        <li>Destina-se exclusivamente a profissionais de saúde habilitados.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE ONBOARDING (primeira visita) -->
+<div class="modal-overlay" id="onboardingOverlay">
+  <div class="modal onboarding-modal">
+    <div class="modal-head">
+      <button class="modal-close" id="skipOnboardingX" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="onboarding-body">
+      <div class="onboarding-dots">
+        <span class="active" data-step="0"></span>
+        <span data-step="1"></span>
+        <span data-step="2"></span>
+      </div>
+
+      <div class="onboarding-step" data-step="0">
+        <div class="onboarding-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2.5" y="9.5" width="19" height="5" rx="2.5" transform="rotate(-45 12 12)"/><line x1="9.5" y1="9.5" x2="14.5" y2="14.5" transform="rotate(-45 12 12)"/></svg>
+        </div>
+        <h3>Bem-vindo ao FarmaPrática</h3>
+        <p>Um guia rápido de indicação, dispensação e orientação farmacêutica, feito para o dia a dia de balcão. Vamos te mostrar como aproveitar melhor em 3 passos rápidos.</p>
+      </div>
+
+      <div class="onboarding-step" data-step="1" style="display:none;">
+        <div class="onboarding-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Encontre rápido</h3>
+        <p>Busque por condição, medicamento ou sintoma na barra de pesquisa. Em qualquer tela, aperte <kbd>/</kbd> para ir direto ao campo de busca.</p>
+      </div>
+
+      <div class="onboarding-step" data-step="2" style="display:none;">
+        <div class="onboarding-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3>Salve seus favoritos</h3>
+        <p>Clique na ★ de qualquer condição para salvá-la na barra lateral e acessá-la rapidamente depois, sem precisar buscar de novo.</p>
+      </div>
+
+      <div class="onboarding-actions">
+        <button class="onboarding-skip" id="skipOnboarding" type="button">Pular</button>
+        <button class="onboarding-next" id="nextOnboarding" type="button">Próximo</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL DE CONSENTIMENTO -->
 <div class="modal-overlay" id="consentOverlay">
@@ -1041,17 +1323,80 @@ const cardsEl = document.getElementById('cards');
 const countEl = document.getElementById('count');
 const emptyEl = document.getElementById('empty');
 const searchEl = document.getElementById('search');
+const shortcutHintEl = document.querySelector('.search-shortcut-hint');
+
+// Atalho de teclado "/" — foca a busca de qualquer lugar da página
+document.addEventListener('keydown', (e) => {
+  if(e.key !== '/') return;
+  const tag = document.activeElement.tagName;
+  const isTyping = tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement.isContentEditable;
+  if(isTyping) return;
+  e.preventDefault();
+  searchEl.focus();
+});
+function toggleShortcutHint(){
+  if(!shortcutHintEl) return;
+  shortcutHintEl.style.display = (document.activeElement === searchEl || searchEl.value) ? 'none' : '';
+}
+searchEl.addEventListener('focus', toggleShortcutHint);
+searchEl.addEventListener('blur', toggleShortcutHint);
+searchEl.addEventListener('input', toggleShortcutHint);
+
+// Modo Balcão — mostra só "Indicações e Posologia" nos cards abertos
+const QUICK_MODE_KEY = 'farmadesk_quickmode_v1';
+const quickModeBtn = document.getElementById('quickModeBtn');
+let quickMode = localStorage.getItem(QUICK_MODE_KEY) === '1';
+
+function applyQuickMode(){
+  document.querySelectorAll('.card-body .block').forEach(block => {
+    const label = block.querySelector('.block-label');
+    if(!label) return;
+    const isPosologia = /posologia|indica[çc][õo]es?/i.test(label.textContent);
+    block.style.display = (quickMode && !isPosologia) ? 'none' : '';
+  });
+}
+function updateQuickModeBtn(){
+  quickModeBtn.classList.toggle('active', quickMode);
+}
+quickModeBtn.addEventListener('click', () => {
+  quickMode = !quickMode;
+  localStorage.setItem(QUICK_MODE_KEY, quickMode ? '1' : '0');
+  updateQuickModeBtn();
+  applyQuickMode();
+});
+updateQuickModeBtn();
+
+// Reaplica automaticamente sempre que o conteúdo dos cards mudar (abrir card, nova busca, etc.)
+new MutationObserver(applyQuickMode).observe(cardsEl, {childList:true, subtree:true});
 
 function countFor(slug){
   if(slug === 'all') return allConditions.length;
   return allConditions.filter(c => c.systemSlug === slug).length;
 }
 
+const SYSTEM_ICONS = {
+  all: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  'sistema-respiratorio': '<path d="M9 2v6a3 3 0 0 1-3 3H4a2 2 0 0 0-2 2v3a4 4 0 0 0 4 4h1"/><path d="M15 2v6a3 3 0 0 0 3 3h2a2 2 0 0 1 2 2v3a4 4 0 0 1-4 4h-1"/><line x1="12" y1="2" x2="12" y2="9"/>',
+  'sistema-cardiovascular': '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>',
+  'sistema-gastrointestinal': '<path d="M8 3c0 3-3 4-3 8a7 7 0 0 0 14 0c0-2-1-3-1-5 0-2-2-3-4-3-1 0-1 1-2 1s-1-1-2-1S8 2 8 3z"/><path d="M9 21c1-2 1-4 0-6"/>',
+  'sistema-geniturinario': '<path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/>',
+  'sistema-endocrino-e-metabolico': '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><line x1="8.6" y1="7.6" x2="10.5" y2="16"/><line x1="15.4" y1="7.6" x2="13.5" y2="16"/>',
+  'sistema-nervoso': '<path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/>',
+  'sistema-musculoesqueletico': '<path d="M7 15a3 3 0 1 0-3.4 3l.4-.1c.5-.1.9-.5 1.3-.9L15 7.3c.4-.4.8-.8.9-1.3l.1-.4a3 3 0 1 0-3-3.4c0 .6.3 1.1.7 1.6L4.7 13.3c-.5.4-1 .7-1.6.7"/>',
+  'dermatologia': '<path d="M6.5 6.5C9 4 11 2.5 12 2.5s3 1.5 5.5 4 4 4.5 4 5.5-1.5 3-4 5.5-4.5 4-5.5 4-3-1.5-5.5-4-4-4.5-4-5.5 1.5-3 4-5.5z"/>',
+  'oftalmologia': '<path d="M1.5 12S5 5 12 5s10.5 7 10.5 7-3.5 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/>',
+  'otorrinolaringologia': '<path d="M8 14c0 3 2 5 5 5a5 5 0 0 0 5-5c0-2-1-3-1-5a5 5 0 0 0-10 0c0 1-1 2-1 3a3 3 0 0 0 3 3"/>',
+  'infectologia': '<circle cx="12" cy="12" r="3.5"/><line x1="12" y1="2" x2="12" y2="5.5"/><line x1="12" y1="18.5" x2="12" y2="22"/><line x1="2" y1="12" x2="5.5" y2="12"/><line x1="18.5" y1="12" x2="22" y2="12"/><line x1="4.9" y1="4.9" x2="7.3" y2="7.3"/><line x1="16.7" y1="16.7" x2="19.1" y2="19.1"/><line x1="19.1" y1="4.9" x2="16.7" y2="7.3"/><line x1="7.3" y1="16.7" x2="4.9" y2="19.1"/>',
+};
+
 function renderSidebar(){
   const items = [{slug:'all', label:'Todos os sistemas'}, ...systems];
   sysListEl.innerHTML = items.map(s => `
     <button class="sys-btn ${activeSystem===s.slug?'active':''}" data-slug="${s.slug}">
-      <span>${s.label}</span>
+      <span class="sys-btn-left">
+        <svg class="sys-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${SYSTEM_ICONS[s.slug] || SYSTEM_ICONS.all}</svg>
+        <span>${s.label}</span>
+      </span>
       <span class="count">${countFor(s.slug)}</span>
     </button>
   `).join('');
@@ -1188,12 +1533,37 @@ if (parentLi && parentLi.querySelector('ul')) {
   });
 }
 
+function animateCountTo(el, target){
+  const start = parseInt(el.textContent.replace(/\D/g,''), 10) || 0;
+  if(start === target){ el.textContent = target; return; }
+  const duration = 350;
+  const startTime = performance.now();
+  function step(now){
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(start + (target - start) * eased);
+    el.textContent = current;
+    if(progress < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+function setCount(value, _total, suffix){
+  let numEl = document.getElementById('countNumber');
+  if(!numEl){
+    countEl.innerHTML = '<span id="countNumber">0</span><span id="countSuffix"></span>';
+    numEl = document.getElementById('countNumber');
+  }
+  document.getElementById('countSuffix').textContent = ' ' + suffix;
+  animateCountTo(numEl, value);
+}
+
 function render(filter){
   const q = (filter || '').trim().toLowerCase();
 
   // Estado inicial: nenhum sistema selecionado e sem busca → painel de boas-vindas
   if(!activeSystem && !q){
-    countEl.textContent = `${allConditions.length} condições disponíveis`;
+    setCount(allConditions.length, allConditions.length, 'condições disponíveis');
     emptyEl.style.display = 'none';
     cardsEl.innerHTML = `
       <div class="welcome-panel">
@@ -1241,8 +1611,14 @@ function render(filter){
     filtered = filtered.filter(c => c.systemSlug === activeSystem);
   }
 
-  countEl.textContent = `${filtered.length} de ${allConditions.length} condições`;
+  setCount(filtered.length, allConditions.length, 'de ' + allConditions.length + ' condições');
   emptyEl.style.display = filtered.length ? 'none' : 'block';
+  if(!filtered.length){
+    const emptySubEl = document.getElementById('emptySub');
+    emptySubEl.textContent = q
+      ? `Não encontramos nada para "${filter}". Tente um termo mais genérico ou verifique a ortografia.`
+      : 'Tente um termo mais genérico ou verifique a ortografia.';
+  }
 
   // Usar createElement para evitar quebra do template literal pelo conteúdo de c.html
   cardsEl.innerHTML = '';
@@ -1492,6 +1868,62 @@ consentBtn.addEventListener('click', () => {
   if(!consentCheck.checked) return;
   localStorage.setItem(CONSENT_KEY, '1');
   consentOverlay.classList.remove('open');
+  maybeShowOnboarding();
+});
+
+// Onboarding (3 telas — primeira visita, exibido após o consentimento)
+const onboardingOverlay = document.getElementById('onboardingOverlay');
+const ONBOARDING_KEY = 'farmadesk_onboarding_v1';
+const onboardingSteps = document.querySelectorAll('.onboarding-step');
+const onboardingDots = document.querySelectorAll('.onboarding-dots span');
+const nextOnboardingBtn = document.getElementById('nextOnboarding');
+let onboardingStep = 0;
+
+function renderOnboardingStep(){
+  onboardingSteps.forEach(s => s.style.display = (Number(s.dataset.step) === onboardingStep) ? '' : 'none');
+  onboardingDots.forEach(d => d.classList.toggle('active', Number(d.dataset.step) === onboardingStep));
+  nextOnboardingBtn.textContent = onboardingStep === onboardingSteps.length - 1 ? 'Começar' : 'Próximo';
+}
+
+function closeOnboarding(){
+  localStorage.setItem(ONBOARDING_KEY, '1');
+  onboardingOverlay.classList.remove('open');
+}
+
+function maybeShowOnboarding(){
+  if(!localStorage.getItem(ONBOARDING_KEY)){
+    onboardingStep = 0;
+    renderOnboardingStep();
+    onboardingOverlay.classList.add('open');
+  }
+}
+
+nextOnboardingBtn.addEventListener('click', () => {
+  if(onboardingStep < onboardingSteps.length - 1){
+    onboardingStep++;
+    renderOnboardingStep();
+  } else {
+    closeOnboarding();
+  }
+});
+document.getElementById('skipOnboarding').addEventListener('click', closeOnboarding);
+document.getElementById('skipOnboardingX').addEventListener('click', closeOnboarding);
+
+// Se o aviso legal já foi aceito em visita anterior, checa o onboarding assim que a página carrega
+if(localStorage.getItem(CONSENT_KEY)){
+  maybeShowOnboarding();
+}
+
+// Modal "Sobre a metodologia"
+const aboutOverlay = document.getElementById('aboutOverlay');
+document.getElementById('openAbout').addEventListener('click', () => {
+  aboutOverlay.classList.add('open');
+});
+document.getElementById('closeAbout').addEventListener('click', () => {
+  aboutOverlay.classList.remove('open');
+});
+aboutOverlay.addEventListener('click', (e) => {
+  if(e.target === aboutOverlay) aboutOverlay.classList.remove('open');
 });
 
 // ============================================================
@@ -2161,8 +2593,23 @@ document.getElementById('calcBtn').addEventListener('click', () => {
   calcResultEl.innerHTML = html;
 });
 
+// Botão "voltar ao topo"
+const backToTopBtn = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTopBtn.classList.toggle('show', window.scrollY > 500);
+});
+backToTopBtn.addEventListener('click', () => {
+  window.scrollTo({top: 0, behavior: 'smooth'});
+});
+
 (async function init(){
   countEl.textContent = 'Carregando condições…';
+  cardsEl.innerHTML = Array.from({length:6}).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton-line tag"></div>
+      <div class="skeleton-line title"></div>
+    </div>
+  `).join('');
   await loadData();
   systems = APP_DATA.systems || [];
   allConditions = APP_DATA.conditions || [];
